@@ -29,18 +29,43 @@ import {
 } from 'lucide-react';
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 35 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 80,
+      damping: 16,
+      mass: 0.8,
+    },
+  },
 };
 
 const fadeInLeft = {
-  hidden: { opacity: 0, x: -30 },
-  visible: { opacity: 1, x: 0 },
+  hidden: { opacity: 0, x: -35 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 80,
+      damping: 16,
+    },
+  },
 };
 
 const fadeInRight = {
-  hidden: { opacity: 0, x: 30 },
-  visible: { opacity: 1, x: 0 },
+  hidden: { opacity: 0, x: 35 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 80,
+      damping: 16,
+    },
+  },
 };
 
 const staggerContainer = {
@@ -49,6 +74,22 @@ const staggerContainer = {
     transition: {
       staggerChildren: 0.1,
       delayChildren: 0.1,
+    },
+  },
+};
+
+const mockupAnimation = {
+  hidden: { opacity: 0, y: 60, scale: 0.96, rotateX: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    rotateX: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 40,
+      damping: 14,
+      delay: 0.25,
     },
   },
 };
@@ -126,6 +167,8 @@ export default function LandingPage() {
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const indicatorOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
 
   useEffect(() => {
     setMounted(true);
@@ -208,20 +251,46 @@ export default function LandingPage() {
       <motion.section
         ref={heroRef}
         className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24"
-        style={{ opacity: heroOpacity, scale: heroScale }}
+        style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
       >
         {/* Background Orbs */}
-        <div
+        <motion.div
           className="absolute top-[10%] left-[5%] w-[500px] h-[500px] rounded-full blur-[150px] pointer-events-none"
           style={{ background: `rgba(0, 168, 125, var(--orb-opacity))` }}
+          animate={{
+            x: [0, 30, 0],
+            y: [0, 40, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
-        <div
+        <motion.div
           className="absolute bottom-[10%] right-[5%] w-[600px] h-[600px] rounded-full blur-[150px] pointer-events-none"
           style={{ background: `rgba(37, 99, 235, var(--orb-opacity))` }}
+          animate={{
+            x: [0, -40, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
-        <div
+        <motion.div
           className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-[120px] pointer-events-none"
           style={{ background: `rgba(124, 58, 237, calc(var(--orb-opacity) * 0.6))` }}
+          animate={{
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
 
         {/* Floating grid pattern */}
@@ -285,8 +354,9 @@ export default function LandingPage() {
 
           {/* Dashboard Preview Mockup */}
           <motion.div
-            variants={fadeInUp}
+            variants={mockupAnimation}
             className="relative mx-auto max-w-5xl"
+            style={{ transformPerspective: 1200 }}
           >
             <div className="relative rounded-2xl border border-border bg-surface/30 backdrop-blur-sm p-2" style={{ boxShadow: 'var(--mockup-shadow)' }}>
               <div className="rounded-xl bg-surface border border-border overflow-hidden">
@@ -381,6 +451,7 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          style={{ opacity: indicatorOpacity }}
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
