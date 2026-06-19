@@ -1,26 +1,266 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
+/* ─── Light Theme (Default) ────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --color-background: #F4F6F8;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F8F9FA;
+  --color-border: #E8ECEF;
+  --color-border-light: #D5DBE1;
+  --color-primary: #00C853;
+  --color-primary-hover: #00B248;
+  --color-primary-muted: rgba(0, 200, 83, 0.08);
+  --color-ai: #1D50D7;
+  --color-ai-muted: rgba(29, 80, 215, 0.08);
+  --color-text: #0C0F12;
+  --color-text-secondary: #4A5568;
+  --color-text-muted: #8E9AA8;
+  --color-success: #00C853;
+  --color-success-muted: rgba(0, 200, 83, 0.08);
+  --color-danger: #FF4A5A;
+  --color-danger-muted: rgba(255, 74, 90, 0.08);
+  --color-warning: #FFA800;
+  --color-warning-muted: rgba(255, 168, 0, 0.08);
+  --color-info: #1D50D7;
+  --color-info-muted: rgba(29, 80, 215, 0.08);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(232, 236, 239, 0.8);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 16px 32px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-hero: 0 20px 60px rgba(0, 0, 0, 0.06);
+  --grid-color: rgba(0, 0, 0, 0.03);
+  --orb-opacity: 0.1;
+  --mockup-shadow: 0 25px 80px rgba(0, 0, 0, 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Dark Theme ───────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  --color-background: #090A0F;
+  --color-surface: #171821;
+  --color-surface-hover: #21232F;
+  --color-border: #232530;
+  --color-border-light: #2E3142;
+  --color-primary: #1BD084;
+  --color-primary-hover: #1CE391;
+  --color-primary-muted: rgba(27, 208, 132, 0.12);
+  --color-ai: #38BDF8;
+  --color-ai-muted: rgba(56, 189, 248, 0.12);
+  --color-text: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-success: #1BD084;
+  --color-success-muted: rgba(27, 208, 132, 0.12);
+  --color-danger: #FF4A5A;
+  --color-danger-muted: rgba(255, 74, 90, 0.12);
+  --color-warning: #FFA800;
+  --color-warning-muted: rgba(255, 168, 0, 0.12);
+  --color-info: #3B82F6;
+  --color-info-muted: rgba(59, 130, 246, 0.12);
+
+  --glass-bg: rgba(23, 24, 33, 0.85);
+  --glass-border: rgba(35, 37, 48, 0.85);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 16px 32px rgba(0, 0, 0, 0.35);
+  --shadow-hero: 0 25px 80px rgba(0, 0, 0, 0.45);
+  --grid-color: rgba(255, 255, 255, 0.02);
+  --orb-opacity: 0.06;
+  --mockup-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-muted: var(--color-primary-muted);
+  --color-ai: var(--color-ai);
+  --color-ai-muted: var(--color-ai-muted);
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-success: var(--color-success);
+  --color-success-muted: var(--color-success-muted);
+  --color-danger: var(--color-danger);
+  --color-danger-muted: var(--color-danger-muted);
+  --color-warning: var(--color-warning);
+  --color-warning-muted: var(--color-warning-muted);
+  --color-info: var(--color-info);
+  --color-info-muted: var(--color-info-muted);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-slide-in-left: slide-in-left 0.3s ease-out;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-count-up: count-up 1s ease-out;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(0, 200, 83, 0.15); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ─── Base styles ──────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-light);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Selection ────────────────────────────────────────────── */
+::selection {
+  background: rgba(0, 200, 150, 0.25);
+  color: inherit;
+}
+
+.dark ::selection {
+  background: rgba(0, 200, 150, 0.3);
+  color: #fff;
+}
+
+/* ─── Focus styles ─────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Card hover effect ────────────────────────────────────── */
+.card-hover {
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.card-hover:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ─── Gradient text ────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-ai) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Glass effect ─────────────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: var(--glass-border);
+}
+
+/* ─── Skeleton loading ─────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-hover) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ─── Number animation ─────────────────────────────────────── */
+@property --num {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+
+/* ─── Chart tooltip style override ─────────────────────────── */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-default-tooltip {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--color-text) !important;
+  font-weight: 600 !important;
+}
+
+.recharts-tooltip-item {
+  color: var(--color-text-secondary) !important;
+}
+
+/* ─── Smooth theme transition ──────────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Override for elements that need their own transitions */
+a, button, input, select, textarea {
+  transition-property: background-color, border-color, box-shadow, color, opacity, transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }

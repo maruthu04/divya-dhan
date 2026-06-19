@@ -1,0 +1,206 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  name              String?
+  email             String             @unique
+  password          String
+  age               Int?
+  occupation        String?
+  monthlyBudget     Float?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  accounts          BankAccount[]
+  incomes           Income[]
+  expenses          Expense[]
+  investments       Investment[]
+  goals             Goal[]
+  notes             Note[]
+  lendings          Lending[]
+  borrowings        Borrowing[]
+  netWorthSnapshots NetWorthSnapshot[]
+  healthScores      HealthScore[]
+  reports           MonthlyReport[]
+  subscriptions     Subscription[]
+}
+
+model BankAccount {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  type          String   // bank, wallet, savings, locker
+  balance       Float
+  bankName      String?
+  accountNumber String?
+  color         String
+  icon          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Income {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String   // salary, freelance, business, trading, rental, interest, dividend, other
+  amount      Float
+  description String
+  date        DateTime
+  recurring   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Expense {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    String   // food, shopping, travel, bills, medical, education, entertainment, investments, rent, groceries, transport, utilities, others
+  amount      Float
+  description String
+  merchant    String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lending {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  borrowerName     String
+  amount           Float
+  remainingBalance Float
+  dueDate          DateTime?
+  notes            String?
+  status           String   @default("pending") // pending, partial, completed
+  payments         Json[]   // List of payments: { id, amount, date, note }
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Borrowing {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lenderName       String
+  amount           Float
+  remainingBalance Float
+  dueDate          DateTime?
+  notes            String?
+  status           String   @default("pending") // pending, partial, completed
+  repayments       Json[]   // List of repayments: { id, amount, date, note }
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Investment {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String   @db.ObjectId
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  type           String   // stocks, mutual_funds, etfs, gold, crypto, fixed_deposit, bonds, real_estate, other
+  investedAmount Float
+  currentValue   Float
+  units          Float?
+  buyPrice       Float?
+  buyDate        DateTime
+  notes          String?
+  isSIP          Boolean  @default(false)
+  sipAmount      Float?
+  sipStartDate   DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Goal {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  category      String   // house, car, emergency_fund, retirement, education, travel, wedding, business, custom
+  targetAmount  Float
+  currentAmount Float
+  deadline      DateTime?
+  icon          String
+  color         String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  category  String   // financial_journal, tax_notes, investment_ideas, general, reminders, research
+  color     String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NetWorthSnapshot {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @db.ObjectId
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalAssets      Float
+  totalLiabilities Float
+  netWorth         Float
+  breakdown        Json     // { bank, cash, investments, gold, property, lentMoney, loans, creditCards, borrowings }
+  date             DateTime
+  createdAt        DateTime @default(now())
+}
+
+model HealthScore {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score           Float
+  factors         Json     // { savingsRate: {score, value}, debtRatio: {score, value}, emergencyFund: {score, months}, investmentDiversity: {score, value}, spendingBehavior: {score, value} }
+  recommendations String[]
+  date            DateTime
+  createdAt       DateTime @default(now())
+}
+
+model MonthlyReport {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String   @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month                String   // YYYY-MM
+  totalIncome          Float
+  totalExpenses        Float
+  totalSavings         Float
+  investmentGrowth     Float
+  topExpenseCategories Json[]   // Array of { category, amount }
+  incomeBySource       Json[]   // Array of { source, amount }
+  recommendations      String[]
+  summary              String
+  createdAt            DateTime @default(now())
+}
+
+model Subscription {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  amount      Float
+  category    String   // Entertainment, Bills & Utilities, Software, Health & Wellness, Other
+  frequency   String   // monthly, yearly, weekly
+  startDate   DateTime
+  nextDueDate DateTime
+  active      Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
