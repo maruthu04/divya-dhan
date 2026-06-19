@@ -22,7 +22,7 @@ Aggregate accounts, track net worth, analyze bank statements with AI, and get pe
 
 ## 🌟 Overview
 
-**DivyaDhan** (meaning *Divine Wealth* in Sanskrit) is a premium, self-hosted **Personal Financial Operating System**. It functions as your digital Chief Financial Officer (CFO)—aggregating accounts, portfolios, lending logs, goals, and subscriptions into one single, gorgeous dashboard.
+**DivyaDhan** (meaning *Divine Wealth* in Sanskrit) is a premium, self-hosted **Personal Financial Operating System**. It functions as your digital Chief Financial Officer (CFO) aggregating accounts, portfolios, lending logs, goals, and subscriptions into one single, gorgeous dashboard.
 
 Unlike commercial tools that monetize your data or lock features behind paywalls, DivyaDhan is completely free, secure, and private. It integrates a contextual **AI Financial Advisor** powered by **Google Gemini** that understands your live portfolio, giving you a custom financial planner in your pocket.
 
@@ -84,8 +84,8 @@ Unlike commercial tools that monetize your data or lock features behind paywalls
 ```
    ┌────────────────────────────────────────────────────────┐
    │                       FRONTEND                         │
-   │      React 19 (Vite)  •  Next.js 16 (App Router)      │
-   │  Tailwind CSS v4  •  Framer Motion  •  Recharts  •  Lucide│
+   │      React 19 (Vite)  •  Next.js 16 (App Router)       │
+   │  Tailwind CSS v4  •  Framer Motion  •  Recharts  •     │
    └───────────────────────────┬────────────────────────────┘
                                │
                                ▼
@@ -99,7 +99,7 @@ Unlike commercial tools that monetize your data or lock features behind paywalls
    ┌────────────────────────────────────────────────────────┐
    │                  AI & PARSING SERVICES                 │
    │     @google/genai (Gemini AI Chat & Recommendations)   │
-   │         Papaparse / XLSX (Automated Statement Ingestion)│
+   │        Papaparse / XLSX (Automated Statement Ingestion)│
    └───────────────────────────┬────────────────────────────┘
                                │
                                ▼
@@ -230,8 +230,8 @@ Distributed under the **MIT License**. Check out `LICENSE` for details.
 🚀 Passionate about Next.js, React, and Generative AI
 
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/maruthu04)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/maruthu01)
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-purple?style=flat-square&logo=vercel)](https://maruthu.in)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/maruthu07)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-purple?style=flat-square&logo=vercel)](https://md-port.vercel.app)
 
 ---
 
