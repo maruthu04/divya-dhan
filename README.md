@@ -2,7 +2,7 @@
 
 > **Brilliant Personal Wealth Management & Financial Command Center**
 
-DivyaDhan is a premium, self-hosted Personal Financial Operating System. It aggregates all aspects of personal finance—accounts, tracking, wealth modules, and goal planning—combined with an advanced AI Advisor powered by Google Gemini.
+DivyaDhan is a premium, self-hosted Personal Financial Operating System. It aggregates all aspects of personal finance accounts, tracking, wealth modules, and goal planning—combined with an advanced AI Advisor powered by Google Gemini.
 
 ---
 
@@ -101,8 +101,3 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to experie
 │   └── types/            # TypeScript Interface definitions
 ```
 
----
-
-## 🛡 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
