@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/components/theme-provider';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -118,9 +118,14 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
+
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   useEffect(() => {
     setMounted(true);
@@ -201,6 +206,7 @@ export default function LandingPage() {
 
       {/* ─── Hero Section ────────────────────────────────────── */}
       <motion.section
+        ref={heroRef}
         className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24"
         style={{ opacity: heroOpacity, scale: heroScale }}
       >
