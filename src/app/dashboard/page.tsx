@@ -31,6 +31,15 @@ function isSameDay(d1: Date | string, d2: Date) {
     d.getDate() === d2.getDate();
 }
 
+function getMidnightTime(dateInput: Date | string) {
+  if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+    const [year, month, day] = dateInput.split('-').map(Number);
+    return new Date(year, month - 1, day).getTime();
+  }
+  const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
 function getMonday(d: Date) {
   const date = new Date(d);
   const day = date.getDay();
@@ -219,28 +228,43 @@ export default function DashboardPage() {
         ...todayIncomes.map((i: any) => ({
           id: i.id, type: 'income' as const, description: i.description,
           amount: i.amount, category: i.source, date: i.date,
+          createdAt: i.createdAt || i.date,
         })),
         ...todayExpensesList.map((e: any) => ({
           id: e.id, type: 'expense' as const, description: e.description,
           amount: e.amount, category: e.category, date: e.date,
+          createdAt: e.createdAt || e.date,
         })),
         ...todayBorrowings.map((b: any) => ({
           id: b.id, type: 'borrowing' as const, description: `Borrowed from ${b.lenderName}`,
           amount: b.amount, category: 'borrowing', date: b.createdAt,
+          createdAt: b.createdAt,
         })),
         ...todayLendings.map((l: any) => ({
           id: l.id, type: 'lending' as const, description: `Lent to ${l.borrowerName}`,
           amount: l.amount, category: 'lending', date: l.createdAt,
+          createdAt: l.createdAt,
         })),
         ...todayBorrowingRepayments.map((r: any) => ({
           id: r.id, type: 'expense' as const, description: `Repaid to ${r.lenderName}`,
           amount: r.amount, category: 'Repayment', date: r.date,
+          createdAt: r.createdAt || r.date,
         })),
         ...todayLendingPayments.map((p: any) => ({
           id: p.id, type: 'income' as const, description: `Received from ${p.borrowerName}`,
           amount: p.amount, category: 'Lending Payment', date: p.date,
+          createdAt: p.createdAt || p.date,
         })),
-      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      ].sort((a, b) => {
+        const midnightA = getMidnightTime(a.date);
+        const midnightB = getMidnightTime(b.date);
+        if (midnightB !== midnightA) {
+          return midnightB - midnightA;
+        }
+        const createdA = new Date(a.createdAt).getTime();
+        const createdB = new Date(b.createdAt).getTime();
+        return createdB - createdA;
+      });
 
       // ─── THIS WEEK'S DATA ────────────────────────────────────
       const thisMonday = getMonday(new Date());
@@ -311,20 +335,33 @@ export default function DashboardPage() {
         ...incomes.map((i: any) => ({
           id: i.id, type: 'income' as const, description: i.description,
           amount: i.amount, category: i.source, date: i.date,
+          createdAt: i.createdAt || i.date,
         })),
         ...expenses.map((e: any) => ({
           id: e.id, type: 'expense' as const, description: e.description,
           amount: e.amount, category: e.category, date: e.date,
+          createdAt: e.createdAt || e.date,
         })),
         ...allBorrowingRepayments.map((r: any) => ({
           id: r.id, type: 'expense' as const, description: `Repaid to ${r.lenderName}`,
           amount: r.amount, category: 'Repayment', date: r.date,
+          createdAt: r.createdAt || r.date,
         })),
         ...allLendingPayments.map((p: any) => ({
           id: p.id, type: 'income' as const, description: `Received from ${p.borrowerName}`,
           amount: p.amount, category: 'Lending Payment', date: p.date,
+          createdAt: p.createdAt || p.date,
         })),
-      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8);
+      ].sort((a, b) => {
+        const midnightA = getMidnightTime(a.date);
+        const midnightB = getMidnightTime(b.date);
+        if (midnightB !== midnightA) {
+          return midnightB - midnightA;
+        }
+        const createdA = new Date(a.createdAt).getTime();
+        const createdB = new Date(b.createdAt).getTime();
+        return createdB - createdA;
+      }).slice(0, 8);
 
       // Expense Breakdown by Category
       const breakdownMap: Record<string, number> = {};

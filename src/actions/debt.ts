@@ -91,6 +91,7 @@ export async function addLendingPayment(lendingId: string, payment: {
       amount: payAmount,
       date: payment.date,
       note: payment.note || '',
+      createdAt: new Date().toISOString(),
     };
 
     await prisma.lending.update({
@@ -233,6 +234,7 @@ export async function addBorrowingRepayment(borrowingId: string, repayment: {
       amount: payAmount,
       date: repayment.date,
       note: repayment.note || '',
+      createdAt: new Date().toISOString(),
     };
 
     await prisma.borrowing.update({
