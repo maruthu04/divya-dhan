@@ -130,7 +130,7 @@ export default function GoalsPage() {
                 <div key={goal.id} className="bg-surface border border-border rounded-xl p-5 card-hover animate-slide-up relative group" style={{ animationDelay: `${(i + 3) * 50}ms` }}>
                   <button
                     onClick={() => handleDelete(goal.id)}
-                    className="absolute top-4 right-4 p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                    className="absolute top-4 right-4 p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                     title="Delete goal"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

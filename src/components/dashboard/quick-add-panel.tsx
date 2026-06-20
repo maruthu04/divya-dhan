@@ -187,13 +187,13 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 px-5 pb-3">
+      <div className="flex gap-1.5 px-5 pb-3 overflow-x-auto no-scrollbar whitespace-nowrap">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg transition-all cursor-pointer',
+              'flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg transition-all cursor-pointer',
               activeTab === tab.id
                 ? 'text-white shadow-sm'
                 : 'text-text-secondary hover:bg-surface-hover border border-transparent hover:border-border'

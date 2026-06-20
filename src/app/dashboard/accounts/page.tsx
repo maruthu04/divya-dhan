@@ -131,7 +131,7 @@ export default function AccountsPage() {
 
           {/* Balance Distribution + Account Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '100ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Balance Distribution</h3>
               {byType.length > 0 ? (
                 <>
@@ -174,7 +174,7 @@ export default function AccountsPage() {
                     setGoalUpdates(initialUpdates);
                     setShowGoalMoneyModal(true);
                   }}
-                  className="absolute top-4 right-4 p-1.5 bg-background hover:bg-primary/10 border border-border hover:border-primary/20 rounded-lg text-text-muted hover:text-primary opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                  className="absolute top-4 right-4 p-1.5 bg-background hover:bg-primary/10 border border-border hover:border-primary/20 rounded-lg text-text-muted hover:text-primary opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                   title="Add Money to Goals"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export default function AccountsPage() {
                   <div key={account.id} className="bg-surface border border-border rounded-xl p-5 card-hover animate-slide-up relative group" style={{ animationDelay: `${(i + 2) * 50}ms` }}>
                     <button
                       onClick={() => handleDelete(account.id)}
-                      className="absolute top-4 right-4 p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                      className="absolute top-4 right-4 p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                       title="Delete account"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

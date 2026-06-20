@@ -38,7 +38,7 @@ function CustomLegend({ payload }: any) {
 
 export default function CashFlowChart({ data }: CashFlowChartProps) {
   return (
-    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '350ms' }}>
+    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '350ms' }}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-text">Cash Flow</h3>

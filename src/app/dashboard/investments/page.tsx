@@ -350,7 +350,7 @@ export default function InvestmentsPage() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Performance Chart */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-text">Portfolio Performance</h3>
                 <div className="flex bg-background border border-border rounded-lg p-0.5">
@@ -395,7 +395,7 @@ export default function InvestmentsPage() {
             </div>
 
             {/* Allocation */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '250ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '250ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Asset Allocation</h3>
               {allocation.length > 0 ? (
                 <div className="flex items-center gap-6">
@@ -422,10 +422,10 @@ export default function InvestmentsPage() {
       )}
 
       {/* Filter */}
-      <div className="flex flex-wrap items-center gap-2 animate-slide-up" style={{ animationDelay: '250ms' }}>
-        <button onClick={() => setFilterType('all')} className={cn('px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterType === 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>All</button>
+      <div className="flex overflow-x-auto no-scrollbar whitespace-nowrap items-center gap-2 pb-1 animate-slide-up" style={{ animationDelay: '250ms' }}>
+        <button onClick={() => setFilterType('all')} className={cn('flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterType === 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>All</button>
         {INVESTMENT_TYPES.map(t => (
-          <button key={t.value} onClick={() => setFilterType(t.value)} className={cn('px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterType === t.value ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>{t.label}</button>
+          <button key={t.value} onClick={() => setFilterType(t.value)} className={cn('flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterType === t.value ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>{t.label}</button>
         ))}
       </div>
 
@@ -498,7 +498,7 @@ export default function InvestmentsPage() {
                     <td className="px-5 py-3.5 text-right">
                       <button
                         onClick={() => handleDelete(inv.id)}
-                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                         title="Delete record"
                       >
                         <Trash2 className="w-4 h-4" />

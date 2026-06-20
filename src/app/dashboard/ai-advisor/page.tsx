@@ -128,7 +128,13 @@ export default function AIAdvisorPage() {
                   ? 'bg-primary/10 text-text'
                   : 'bg-background border border-border text-text-secondary'
               )}>
-                <div className="whitespace-pre-line leading-relaxed">{msg.content}</div>
+                <div className="leading-relaxed space-y-1.5">
+                  {msg.role === 'user' ? (
+                    <div className="whitespace-pre-line">{msg.content}</div>
+                  ) : (
+                    parseMarkdown(msg.content)
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -186,3 +192,89 @@ export default function AIAdvisorPage() {
     </div>
   );
 }
+
+const parseMarkdown = (text: string) => {
+  const lines = text.split('\n');
+  return lines.map((line, index) => {
+    const cleanLine = line.replace(/\r$/, '');
+    const trimmed = cleanLine.trim();
+
+    // 1. Horizontal rule
+    if (trimmed === '---') {
+      return <hr key={index} className="my-3 border-t border-border" />;
+    }
+
+    // 2. Headings
+    if (trimmed.startsWith('### ')) {
+      return (
+        <h3 key={index} className="text-sm font-bold text-text mt-3 mb-1 first:mt-0">
+          {parseInline(trimmed.substring(4))}
+        </h3>
+      );
+    }
+    if (trimmed.startsWith('## ')) {
+      return (
+        <h2 key={index} className="text-base font-bold text-text mt-4 mb-1.5 first:mt-0">
+          {parseInline(trimmed.substring(3))}
+        </h2>
+      );
+    }
+    if (trimmed.startsWith('# ')) {
+      return (
+        <h1 key={index} className="text-lg font-bold text-text mt-5 mb-2 first:mt-0">
+          {parseInline(trimmed.substring(2))}
+        </h1>
+      );
+    }
+
+    // 3. Bullet list item
+    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+      const content = trimmed.substring(2);
+      return (
+        <div key={index} className="flex items-start gap-2 ml-2 my-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-ai mt-1.5 flex-shrink-0" />
+          <span className="flex-1 text-sm text-text-secondary">{parseInline(content)}</span>
+        </div>
+      );
+    }
+
+    // 4. Numbered list item (e.g. "1. ")
+    const numMatch = trimmed.match(/^(\d+)\.\s(.*)/);
+    if (numMatch) {
+      const num = numMatch[1];
+      const content = numMatch[2];
+      return (
+        <div key={index} className="flex items-start gap-1.5 ml-2 my-1">
+          <span className="text-xs font-bold text-ai mt-0.5 w-4 flex-shrink-0">{num}.</span>
+          <span className="flex-1 text-sm text-text-secondary">{parseInline(content)}</span>
+        </div>
+      );
+    }
+
+    // 5. Empty space
+    if (trimmed === '') {
+      return <div key={index} className="h-2" />;
+    }
+
+    // 6. Regular paragraph
+    return (
+      <p key={index} className="text-sm text-text-secondary leading-relaxed my-0.5">
+        {parseInline(cleanLine)}
+      </p>
+    );
+  });
+};
+
+const parseInline = (text: string) => {
+  const regex = /(\*\*.*?\*\*|\*.*?\*)/g;
+  const segments = text.split(regex);
+  return segments.map((seg, i) => {
+    if (seg.startsWith('**') && seg.endsWith('**')) {
+      return <strong key={i} className="font-bold text-text">{seg.slice(2, -2)}</strong>;
+    }
+    if (seg.startsWith('*') && seg.endsWith('*')) {
+      return <em key={i} className="italic text-text-secondary">{seg.slice(1, -1)}</em>;
+    }
+    return seg;
+  });
+};

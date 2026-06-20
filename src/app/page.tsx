@@ -358,7 +358,7 @@ export default function LandingPage() {
             className="relative mx-auto max-w-5xl"
             style={{ transformPerspective: 1200 }}
           >
-            <div className="relative rounded-2xl border border-border bg-surface/30 backdrop-blur-sm p-2" style={{ boxShadow: 'var(--mockup-shadow)' }}>
+            <div className="relative w-full max-w-full overflow-hidden rounded-2xl border border-border bg-surface/30 backdrop-blur-sm p-2" style={{ boxShadow: 'var(--mockup-shadow)' }}>
               <div className="rounded-xl bg-surface border border-border overflow-hidden">
                 {/* Mock browser bar */}
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-background/50">
@@ -377,7 +377,7 @@ export default function LandingPage() {
                 {/* Mock Dashboard Content */}
                 <div className="p-6 space-y-4">
                   {/* Mock stat cards row */}
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Net Worth', value: '₹12.5L', color: 'var(--color-primary)', change: '+5.1%' },
                       { label: 'Monthly Income', value: '₹1.95L', color: 'var(--color-success)', change: '+8.2%' },
@@ -400,7 +400,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Mock chart area */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="rounded-xl bg-background border border-border p-4 h-32 flex items-end gap-1" style={{ boxShadow: 'var(--shadow-card)' }}>
                       {[40, 55, 45, 65, 50, 70, 60, 80, 72, 85, 78, 90].map((h, i) => (
                         <motion.div

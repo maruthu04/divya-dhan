@@ -126,7 +126,7 @@ export default function ProjectionsPage() {
         </div>
 
         {/* Chart */}
-        <div className="lg:col-span-2 bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="lg:col-span-2 bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '100ms' }}>
           <h3 className="text-sm font-semibold text-text mb-4">Wealth Growth Projection</h3>
           <div className="h-[420px]">
             <ResponsiveContainer width="100%" height="100%">

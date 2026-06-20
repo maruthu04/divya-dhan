@@ -123,7 +123,7 @@ export default function ReportsPage() {
       </div>
 
       {/* 6-Month Comparison Chart */}
-      <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up">
+      <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden">
         <h3 className="text-sm font-semibold text-text mb-4">6-Month Overview</h3>
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">

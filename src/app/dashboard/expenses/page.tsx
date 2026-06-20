@@ -154,7 +154,7 @@ export default function ExpensesPage() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Trend */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '150ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '150ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Spending Trend</h3>
               <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -170,7 +170,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Category Breakdown */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '200ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Category Breakdown</h3>
               {topCategories.length > 0 ? (
                 <div className="h-[250px]">
@@ -195,10 +195,10 @@ export default function ExpensesPage() {
       )}
 
       {/* Filter */}
-      <div className="flex flex-wrap items-center gap-2 animate-slide-up" style={{ animationDelay: '250ms' }}>
-        <button onClick={() => setFilterCategory('all')} className={cn('px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterCategory === 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>All</button>
+      <div className="flex overflow-x-auto no-scrollbar whitespace-nowrap items-center gap-2 pb-1 animate-slide-up" style={{ animationDelay: '250ms' }}>
+        <button onClick={() => setFilterCategory('all')} className={cn('flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterCategory === 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>All</button>
         {EXPENSE_CATEGORIES.slice(0, 8).map(c => (
-          <button key={c.value} onClick={() => setFilterCategory(c.value)} className={cn('px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterCategory === c.value ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>{c.label}</button>
+          <button key={c.value} onClick={() => setFilterCategory(c.value)} className={cn('flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer', filterCategory === c.value ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover')}>{c.label}</button>
         ))}
       </div>
 
@@ -237,7 +237,7 @@ export default function ExpensesPage() {
                     <td className="px-5 py-3.5 text-right">
                       <button
                         onClick={() => handleDelete(expense.id)}
-                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                         title="Delete record"
                       >
                         <Trash2 className="w-4 h-4" />

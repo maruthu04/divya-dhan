@@ -160,7 +160,7 @@ export default function WeeklyOverview({
 
       {/* Daily Breakdown Chart */}
       <div className="px-5 pb-5">
-        <div className="bg-background border border-border/50 rounded-xl p-4">
+        <div className="bg-background border border-border/50 rounded-xl p-4 w-full min-w-0 overflow-hidden">
           <h3 className="text-[11px] font-medium text-text-muted uppercase tracking-wider mb-3">Daily Breakdown</h3>
           <div className="h-[180px]">
             <ResponsiveContainer width="100%" height="100%">

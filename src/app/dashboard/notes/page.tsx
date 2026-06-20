@@ -328,7 +328,7 @@ export default function NotesPage() {
                     >
                       {catMeta?.label}
                     </span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => handleTogglePin(note.id, e)}
                         className="p-1 rounded cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/10"

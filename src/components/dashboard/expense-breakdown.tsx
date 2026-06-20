@@ -27,7 +27,7 @@ export default function ExpenseBreakdown({ data }: ExpenseBreakdownProps) {
   const otherAmount = data.slice(5).reduce((sum, d) => sum + d.amount, 0);
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '400ms' }}>
+    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '400ms' }}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-text">Expense Breakdown</h3>

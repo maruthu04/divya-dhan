@@ -32,7 +32,7 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
   const changeColor = pctChange > 0 ? 'text-success bg-success-muted' : pctChange < 0 ? 'text-danger bg-danger-muted' : 'text-text-muted bg-surface-hover';
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '300ms' }}>
+    <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '300ms' }}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-text">Net Worth Trend</h3>

@@ -11,9 +11,9 @@ import {
 import { useState } from 'react';
 
 const mainNav = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Home', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Expenses', href: '/dashboard/expenses', icon: ArrowUpRight },
-  { label: 'Investments', href: '/dashboard/investments', icon: TrendingUp },
+  { label: 'Invest', href: '/dashboard/investments', icon: TrendingUp },
   { label: 'AI Advisor', href: '/dashboard/ai-advisor', icon: Bot },
   { label: 'More', href: '#more', icon: MoreHorizontal },
 ];
@@ -62,7 +62,7 @@ export default function MobileNav() {
                     )}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="text-[10px] font-medium">{item.label}</span>
+                    <span className="text-[10px] font-medium whitespace-nowrap">{item.label}</span>
                   </Link>
                 );
               })}
@@ -72,7 +72,7 @@ export default function MobileNav() {
       )}
 
       {/* Bottom nav bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border glass">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface">
         <div className="flex items-center justify-around h-16 px-2">
           {mainNav.map((item) => {
             const Icon = item.icon;
@@ -114,7 +114,7 @@ export default function MobileNav() {
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
                   )}
                 </div>
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[10px] font-medium whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}

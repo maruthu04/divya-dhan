@@ -161,7 +161,7 @@ export default function IncomePage() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Monthly Trend */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '150ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '150ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Monthly Income Trend</h3>
               <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -181,7 +181,7 @@ export default function IncomePage() {
             </div>
 
             {/* By Source */}
-            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="bg-surface border border-border rounded-xl p-5 animate-slide-up w-full min-w-0 overflow-hidden" style={{ animationDelay: '200ms' }}>
               <h3 className="text-sm font-semibold text-text mb-4">Income by Source</h3>
               {bySource.length > 0 ? (
                 <div className="flex items-center gap-6">
@@ -216,11 +216,11 @@ export default function IncomePage() {
       )}
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-2 animate-slide-up" style={{ animationDelay: '250ms' }}>
+      <div className="flex overflow-x-auto no-scrollbar whitespace-nowrap items-center gap-2 pb-1 animate-slide-up" style={{ animationDelay: '250ms' }}>
         <button
           onClick={() => setFilterSource('all')}
           className={cn(
-            'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer',
+            'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer',
             filterSource === 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover'
           )}
         >
@@ -231,7 +231,7 @@ export default function IncomePage() {
             key={s.value}
             onClick={() => setFilterSource(s.value)}
             className={cn(
-              'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer',
+              'flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer',
               filterSource === s.value ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-text-secondary hover:bg-surface-hover'
             )}
           >
@@ -273,7 +273,7 @@ export default function IncomePage() {
                     <td className="px-5 py-3.5 text-right">
                       <button
                         onClick={() => handleDelete(income.id)}
-                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
                         title="Delete record"
                       >
                         <Trash2 className="w-4 h-4" />
