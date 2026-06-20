@@ -90,22 +90,6 @@ export default function WeeklyOverview({
     },
   ];
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload) return null;
-    return (
-      <div className="bg-surface border border-border rounded-lg px-3 py-2 shadow-xl text-xs">
-        <p className="font-semibold text-text mb-1">{label}</p>
-        {payload.map((entry: any) => (
-          <div key={entry.name} className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.fill || entry.color }} />
-            <span className="text-text-secondary capitalize">{entry.name}:</span>
-            <span className="font-medium text-text">{formatCurrency(entry.value)}</span>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="bg-surface border border-border rounded-2xl overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
       {/* Header */}
@@ -198,6 +182,22 @@ export default function WeeklyOverview({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload) return null;
+  return (
+    <div className="bg-surface border border-border rounded-lg px-3 py-2 shadow-xl text-xs">
+      <p className="font-semibold text-text mb-1">{label}</p>
+      {payload.map((entry: any) => (
+        <div key={entry.name} className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.fill || entry.color }} />
+          <span className="text-text-secondary capitalize">{entry.name}:</span>
+          <span className="font-medium text-text">{formatCurrency(entry.value)}</span>
+        </div>
+      ))}
     </div>
   );
 }

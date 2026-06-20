@@ -10,13 +10,7 @@ import RecentTransactions from '@/components/dashboard/recent-transactions';
 import TodayReport from '@/components/dashboard/today-report';
 import QuickAddPanel from '@/components/dashboard/quick-add-panel';
 import WeeklyOverview from '@/components/dashboard/weekly-overview';
-import { getIncomes } from '@/actions/income';
-import { getExpenses } from '@/actions/expenses';
-import { getAccounts } from '@/actions/accounts';
-import { getInvestments } from '@/actions/investments';
-import { getLendings, getBorrowings } from '@/actions/debt';
-import { getCurrentUser } from '@/actions/auth';
-import { getGoals } from '@/actions/goals';
+import { getDashboardData } from '@/actions/dashboard';
 import {
   Wallet, TrendingUp, TrendingDown, ArrowDownLeft,
   ArrowUpRight, PiggyBank, BarChart3, Activity, Loader2
@@ -115,16 +109,12 @@ export default function DashboardPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [incomes, expenses, accounts, investments, lendings, borrowings, userSession, goals] = await Promise.all([
-        getIncomes(),
-        getExpenses(),
-        getAccounts(),
-        getInvestments(),
-        getLendings(),
-        getBorrowings(),
-        getCurrentUser(),
-        getGoals(),
-      ]);
+      const res = await getDashboardData();
+      if ('error' in res || !res.success) {
+        throw new Error((res as any).error || 'Failed to load dashboard data');
+      }
+      
+      const { incomes, expenses, accounts, investments, lendings, borrowings, goals, user: userSession } = res;
 
       // ─── Assets & Liabilities ─────────────────────────────────
       const bankAndWalletBalance = accounts.reduce((sum: number, a: any) => sum + a.balance, 0);
