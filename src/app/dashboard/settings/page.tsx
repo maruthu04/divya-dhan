@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, Shield, Loader2, Save, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { getUserProfileData, updateUserProfile, changeUserPassword } from '@/actions/profile';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -71,6 +73,8 @@ export default function SettingsPage() {
 
       if (res.success) {
         toast.success('Profile updated successfully!');
+        router.push('/dashboard');
+        router.refresh();
       } else {
         toast.error(res.error || 'Failed to update profile');
       }
@@ -110,6 +114,8 @@ export default function SettingsPage() {
           newPassword: '',
           confirmPassword: '',
         });
+        router.push('/dashboard');
+        router.refresh();
       } else {
         toast.error(res.error || 'Failed to update password');
       }
