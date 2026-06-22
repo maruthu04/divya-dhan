@@ -27,15 +27,19 @@ export default function IncomePage() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [recurring, setRecurring] = useState(false);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
     const data = await getIncomes();
     setIncomes(data);
-    setLoading(false);
+    if (isInitial) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

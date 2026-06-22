@@ -115,8 +115,10 @@ export default function DashboardPage() {
     lastWeekExpenses: 0,
   });
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
     try {
       const res = await getDashboardData();
       if ('error' in res || !res.success) {
@@ -480,12 +482,14 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Failed to compute dashboard metrics', err);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, [loadData]);
 
   // Get greeting based on time

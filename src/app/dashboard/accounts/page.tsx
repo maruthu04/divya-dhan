@@ -33,19 +33,23 @@ export default function AccountsPage() {
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
     const [accountsData, goalsData] = await Promise.all([
       getAccounts(),
       getGoals()
     ]);
     setAccounts(accountsData);
     setGoals(goalsData);
-    setLoading(false);
+    if (isInitial) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

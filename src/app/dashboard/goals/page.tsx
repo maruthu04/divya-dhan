@@ -26,15 +26,19 @@ export default function GoalsPage() {
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [editSavedVal, setEditSavedVal] = useState('');
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
     const data = await getGoals();
     setGoals(data);
-    setLoading(false);
+    if (isInitial) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
