@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [hasPassword, setHasPassword] = useState(true);
 
   // Profile fields
   const [profileData, setProfileData] = useState({
@@ -41,6 +42,7 @@ export default function SettingsPage() {
             occupation: res.data.occupation || '',
             monthlyBudget: res.data.monthlyBudget?.toString() || '',
           });
+          setHasPassword(!!res.hasPassword);
         } else {
           toast.error(res.error || 'Failed to load user profile');
         }
@@ -88,7 +90,7 @@ export default function SettingsPage() {
     e.preventDefault();
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if ((hasPassword && !currentPassword) || !newPassword || !confirmPassword) {
       toast.error('All fields are required.');
       return;
     }
@@ -113,6 +115,7 @@ export default function SettingsPage() {
           newPassword: '',
           confirmPassword: '',
         });
+        setHasPassword(true);
         router.push('/dashboard');
         router.refresh();
       } else {
@@ -269,16 +272,18 @@ export default function SettingsPage() {
 
             <div className="space-y-5">
               {/* Current Password */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">Current Password</label>
-                <input
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 transition-colors"
-                />
-              </div>
+              {hasPassword && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">Current Password</label>
+                  <input
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    placeholder="••••••••"
+                    className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+              )}
 
               {/* New Password */}
               <div className="space-y-1.5">

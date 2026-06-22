@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const inter = Inter({
@@ -28,6 +29,7 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           {children}
+          <Toaster richColors position="top-right" closeButton />
         </ThemeProvider>
       </body>
     </html>

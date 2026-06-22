@@ -26,10 +26,19 @@ export async function getUserProfileData() {
         age: true,
         occupation: true,
         monthlyBudget: true,
+        password: true,
         createdAt: true,
       },
     });
-    return { success: true, data: user };
+
+    if (!user) {
+      return { error: 'User not found' };
+    }
+
+    const { password, ...safeUser } = user;
+    const hasPassword = !!password;
+
+    return { success: true, data: safeUser, hasPassword };
   } catch (error: any) {
     console.error('Get profile data error:', error);
     return { error: error.message || 'Failed to fetch profile data' };
@@ -70,14 +79,6 @@ export async function changeUserPassword(currentPass: string, newPass: string) {
   try {
     const userId = await getSessionUser();
 
-    if (!currentPass || !newPass) {
-      return { error: 'Both current and new password are required.' };
-    }
-
-    if (newPass.length < 6) {
-      return { error: 'New password must be at least 6 characters long.' };
-    }
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -86,10 +87,36 @@ export async function changeUserPassword(currentPass: string, newPass: string) {
       return { error: 'User not found.' };
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(currentPass, user.password);
-    if (!isMatch) {
-      return { error: 'Current password is incorrect.' };
+    if (!newPass) {
+      return { error: 'New password is required.' };
+    }
+
+    if (newPass.length < 6) {
+      return { error: 'New password must be at least 6 characters long.' };
+    }
+
+    // Compare password if user already has one set (e.g., credentials signup)
+    if (user.password) {
+      if (!currentPass) {
+        return { error: 'Current password is required.' };
+      }
+
+      let isMatch = false;
+      try {
+        if (user.password.startsWith('$2')) {
+          isMatch = await bcrypt.compare(currentPass, user.password);
+        } else {
+          // Support plain text passwords for testing/dev environments
+          isMatch = currentPass === user.password;
+        }
+      } catch (err) {
+        // Fallback to direct comparison if bcrypt comparison fails due to format
+        isMatch = currentPass === user.password;
+      }
+
+      if (!isMatch) {
+        return { error: 'Current password is incorrect.' };
+      }
     }
 
     // Hash new password
