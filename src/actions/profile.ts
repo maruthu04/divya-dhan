@@ -38,7 +38,7 @@ export async function getUserProfileData() {
 
 export async function updateUserProfile(data: {
   name: string;
-  email: string;
+  email?: string;
   age?: number;
   occupation?: string;
   monthlyBudget?: number;
@@ -46,24 +46,11 @@ export async function updateUserProfile(data: {
   try {
     const userId = await getSessionUser();
 
-    // Check if email is already taken by another user
-    const normalizedEmail = data.email.toLowerCase().trim();
-    const existing = await prisma.user.findFirst({
-      where: {
-        email: normalizedEmail,
-        id: { not: userId },
-      },
-    });
-
-    if (existing) {
-      return { error: 'Email is already taken by another account.' };
-    }
-
     const result = await prisma.user.update({
       where: { id: userId },
       data: {
         name: data.name.trim(),
-        email: normalizedEmail,
+        // email is intentionally omitted to keep it un-editable/locked after registration
         age: data.age ? Number(data.age) : null,
         occupation: data.occupation ? data.occupation.trim() : null,
         monthlyBudget: data.monthlyBudget ? Number(data.monthlyBudget) : null,
