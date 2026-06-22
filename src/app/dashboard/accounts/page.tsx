@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAccounts, addAccount, deleteAccount } from '@/actions/accounts';
+import { addAccount, deleteAccount } from '@/actions/accounts';
+import { useData } from '@/components/dashboard/data-provider';
 import { getGoals, addMoneyToGoals } from '@/actions/goals';
 import { ACCOUNT_TYPES } from '@/lib/constants';
 import { formatCurrency } from '@/lib/formatters';
@@ -18,9 +19,8 @@ const typeColors: Record<string, string> = {
 };
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const { accounts, loading, refetch: loadData } = useData();
   const [goals, setGoals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showGoalMoneyModal, setShowGoalMoneyModal] = useState(false);
   const [goalUpdates, setGoalUpdates] = useState<Record<string, string>>({});
@@ -33,23 +33,14 @@ export default function AccountsPage() {
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
 
-  const loadData = async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
-    const [accountsData, goalsData] = await Promise.all([
-      getAccounts(),
-      getGoals()
-    ]);
-    setAccounts(accountsData);
+  const fetchGoals = async () => {
+    const goalsData = await getGoals();
     setGoals(goalsData);
-    if (isInitial) {
-      setLoading(false);
-    }
   };
 
   useEffect(() => {
-    loadData(true);
+    loadData();
+    fetchGoals();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

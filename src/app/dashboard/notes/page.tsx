@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getNotes, addNote, togglePinNote, deleteNote } from '@/actions/notes';
+import { addNote, togglePinNote, deleteNote } from '@/actions/notes';
+import { useData } from '@/components/dashboard/data-provider';
 import { NOTE_CATEGORIES, NOTE_COLORS } from '@/lib/constants';
 import { getRelativeTime } from '@/lib/formatters';
 import { useTheme } from '@/components/theme-provider';
@@ -194,8 +195,7 @@ const colorThemes: Record<
 
 export default function NotesPage() {
   const { theme: activeTheme } = useTheme();
-  const [notes, setNotes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { notes, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -205,13 +205,6 @@ export default function NotesPage() {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('general');
   const [color, setColor] = useState('#DCFCE7');
-
-  const loadData = async () => {
-    setLoading(true);
-    const data = await getNotes();
-    setNotes(data);
-    setLoading(false);
-  };
 
   useEffect(() => {
     loadData();

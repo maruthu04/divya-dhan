@@ -11,7 +11,7 @@ export async function getDashboardData() {
       throw new Error('Unauthorized');
     }
 
-    const [incomes, expenses, accounts, investments, lendings, borrowings, goals] = await Promise.all([
+    const [incomes, expenses, accounts, investments, lendings, borrowings, goals, notes, subscriptions] = await Promise.all([
       prisma.income.findMany({
         where: { userId },
         orderBy: { date: 'desc' },
@@ -40,6 +40,17 @@ export async function getDashboardData() {
         where: { userId },
         orderBy: { createdAt: 'desc' },
       }),
+      prisma.note.findMany({
+        where: { userId },
+        orderBy: [
+          { pinned: 'desc' },
+          { updatedAt: 'desc' },
+        ],
+      }),
+      prisma.subscription.findMany({
+        where: { userId },
+        orderBy: { nextDueDate: 'asc' },
+      }),
     ]);
 
     const dbUser = await prisma.user.findUnique({
@@ -56,6 +67,8 @@ export async function getDashboardData() {
       lendings,
       borrowings,
       goals,
+      notes,
+      subscriptions,
       user: {
         name: dbUser?.name || session?.user?.name || 'User',
         email: session?.user?.email,

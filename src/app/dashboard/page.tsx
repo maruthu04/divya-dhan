@@ -10,7 +10,7 @@ import RecentTransactions from '@/components/dashboard/recent-transactions';
 import TodayReport from '@/components/dashboard/today-report';
 import QuickAddPanel from '@/components/dashboard/quick-add-panel';
 import WeeklyOverview from '@/components/dashboard/weekly-overview';
-import { getDashboardData } from '@/actions/dashboard';
+import { useData } from '@/components/dashboard/data-provider';
 import {
   Wallet, TrendingUp, TrendingDown, ArrowDownLeft,
   ArrowUpRight, PiggyBank, BarChart3, Activity, Loader2
@@ -78,7 +78,6 @@ function isSameMonth(dateInput: Date | string, targetMonth: number, targetYear: 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>({
     netWorth: 0,
     totalAssets: 0,
@@ -123,17 +122,12 @@ export default function DashboardPage() {
     lastWeekExpenses: 0,
   });
 
-  const loadData = useCallback(async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
+  const { incomes, expenses, accounts, investments, lendings, borrowings, goals, user, loading, refetch: loadData } = useData();
+
+  useEffect(() => {
+    if (loading) return;
     try {
-      const res = await getDashboardData();
-      if ('error' in res || !res.success) {
-        throw new Error((res as any).error || 'Failed to load dashboard data');
-      }
-      
-      const { incomes, expenses, accounts, investments, lendings, borrowings, goals, user: userSession } = res;
+      const userSession = user;
 
       // ─── Assets & Liabilities ─────────────────────────────────
       const bankAndWalletBalance = accounts.reduce((sum: number, a: any) => sum + a.balance, 0);
@@ -497,16 +491,8 @@ export default function DashboardPage() {
       });
     } catch (err) {
       console.error('Failed to compute dashboard metrics', err);
-    } finally {
-      if (isInitial) {
-        setLoading(false);
-      }
     }
-  }, []);
-
-  useEffect(() => {
-    loadData(true);
-  }, [loadData]);
+  }, [incomes, expenses, accounts, investments, lendings, borrowings, goals, user, loading]);
 
   // Get greeting based on time
   const getGreeting = () => {

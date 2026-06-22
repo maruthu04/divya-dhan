@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getGoals, addGoal, updateGoalAmount, deleteGoal } from '@/actions/goals';
+import { addGoal, deleteGoal, updateGoalAmount } from '@/actions/goals';
+import { useData } from '@/components/dashboard/data-provider';
 import { GOAL_CATEGORIES } from '@/lib/constants';
 import { formatCurrency, formatCompactCurrency, formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -10,8 +11,7 @@ import { Target, Plus, X, Home, Car, Shield, Plane, GraduationCap, Heart, Buildi
 const iconMap: Record<string, any> = { Home, Car, Shield, Plane, GraduationCap, Heart, Building2, Sunset, Target };
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { goals, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
 
   // Form states (Add Goal)
@@ -26,19 +26,8 @@ export default function GoalsPage() {
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [editSavedVal, setEditSavedVal] = useState('');
 
-  const loadData = async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
-    const data = await getGoals();
-    setGoals(data);
-    if (isInitial) {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadData(true);
+    loadData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

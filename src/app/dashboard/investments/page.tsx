@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getInvestments, addInvestment, deleteInvestment } from '@/actions/investments';
+import { addInvestment, deleteInvestment } from '@/actions/investments';
+import { useData } from '@/components/dashboard/data-provider';
 import { INVESTMENT_TYPES } from '@/lib/constants';
 import { formatCurrency, formatPercentage } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -190,8 +191,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function InvestmentsPage() {
-  const [investments, setInvestments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { investments, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');
   const [timeframe, setTimeframe] = useState<'6M' | '1Y' | 'ALL'>('6M');
@@ -207,13 +207,6 @@ export default function InvestmentsPage() {
   const [isSIP, setIsSIP] = useState(false);
   const [sipAmount, setSipAmount] = useState('');
   const [sipStartDate, setSipStartDate] = useState(new Date().toISOString().split('T')[0]);
-
-  const loadData = async () => {
-    setLoading(true);
-    const data = await getInvestments();
-    setInvestments(data);
-    setLoading(false);
-  };
 
   useEffect(() => {
     loadData();

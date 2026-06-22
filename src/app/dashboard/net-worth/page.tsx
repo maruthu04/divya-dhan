@@ -1,94 +1,61 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { formatCurrency, formatCompactCurrency } from '@/lib/formatters';
-import { getAccounts } from '@/actions/accounts';
-import { getInvestments } from '@/actions/investments';
-import { getLendings, getBorrowings } from '@/actions/debt';
-import { getGoals } from '@/actions/goals';
+import { useData } from '@/components/dashboard/data-provider';
 import { Scale, TrendingUp, Building2, Coins, TrendingDown, Wallet, PiggyBank, Lock, Gem, HandCoins, CreditCard, Loader2, Target } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function NetWorthPage() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({
-    bankBalance: 0,
-    cashBalance: 0,
-    savingsBalance: 0,
-    lockerBalance: 0,
-    investmentsValue: 0,
-    goldValue: 0,
-    lentMoney: 0,
-    goalsSaved: 0,
-    borrowings: 0,
-    totalAssets: 0,
-    totalLiabilities: 0,
-    netWorth: 0,
-    chartData: [] as any[],
-  });
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [accounts, investments, lendings, borrowings, goals] = await Promise.all([
-        getAccounts(),
-        getInvestments(),
-        getLendings(),
-        getBorrowings(),
-        getGoals(),
-      ]);
-
-      const bankBalance = accounts.filter((a: any) => a.type === 'bank').reduce((s: number, a: any) => s + a.balance, 0);
-      const cashBalance = accounts.filter((a: any) => a.type === 'wallet').reduce((s: number, a: any) => s + a.balance, 0);
-      const savingsBalance = accounts.filter((a: any) => a.type === 'savings').reduce((s: number, a: any) => s + a.balance, 0);
-      const lockerBalance = accounts.filter((a: any) => a.type === 'locker').reduce((s: number, a: any) => s + a.balance, 0);
-      const investmentsValue = investments.reduce((s: number, i: any) => s + i.currentValue, 0);
-      const goldValue = investments.filter((i: any) => i.type === 'gold').reduce((s: number, i: any) => s + i.currentValue, 0);
-      const lentMoney = lendings.reduce((s: number, l: any) => s + l.remainingBalance, 0);
-      const goalsSaved = goals.reduce((s: number, g: any) => s + g.currentAmount, 0);
-      const totalAssets = bankBalance + cashBalance + savingsBalance + lockerBalance + investmentsValue + lentMoney + goalsSaved;
-
-      const borrowingBal = borrowings.reduce((s: number, b: any) => s + b.remainingBalance, 0);
-      const totalLiabilities = borrowingBal;
-      const netWorth = totalAssets - totalLiabilities;
-
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const now = new Date();
-      const chartData = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const mName = months[d.getMonth()];
-        chartData.push({
-          month: mName,
-          value: i === 0 ? netWorth : 0,
-        });
-      }
-
-      setData({
-        bankBalance,
-        cashBalance,
-        savingsBalance,
-        lockerBalance,
-        investmentsValue,
-        goldValue,
-        lentMoney,
-        goalsSaved,
-        borrowings: borrowingBal,
-        totalAssets,
-        totalLiabilities,
-        netWorth,
-        chartData,
-      });
-    } catch (err) {
-      console.error('Failed to load net worth metrics', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { accounts, investments, lendings, borrowings, goals, loading, refetch: loadData } = useData();
 
   useEffect(() => {
     loadData();
   }, []);
+
+  const data = useMemo(() => {
+    const bankBalance = accounts.filter((a: any) => a.type === 'bank').reduce((s: number, a: any) => s + a.balance, 0);
+    const cashBalance = accounts.filter((a: any) => a.type === 'wallet').reduce((s: number, a: any) => s + a.balance, 0);
+    const savingsBalance = accounts.filter((a: any) => a.type === 'savings').reduce((s: number, a: any) => s + a.balance, 0);
+    const lockerBalance = accounts.filter((a: any) => a.type === 'locker').reduce((s: number, a: any) => s + a.balance, 0);
+    const investmentsValue = investments.reduce((s: number, i: any) => s + i.currentValue, 0);
+    const goldValue = investments.filter((i: any) => i.type === 'gold').reduce((s: number, i: any) => s + i.currentValue, 0);
+    const lentMoney = lendings.reduce((s: number, l: any) => s + l.remainingBalance, 0);
+    const goalsSaved = goals.reduce((s: number, g: any) => s + g.currentAmount, 0);
+    const totalAssets = bankBalance + cashBalance + savingsBalance + lockerBalance + investmentsValue + lentMoney + goalsSaved;
+
+    const borrowingBal = borrowings.reduce((s: number, b: any) => s + b.remainingBalance, 0);
+    const totalLiabilities = borrowingBal;
+    const netWorth = totalAssets - totalLiabilities;
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const now = new Date();
+    const chartData = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mName = months[d.getMonth()];
+      chartData.push({
+        month: mName,
+        value: i === 0 ? netWorth : 0,
+      });
+    }
+
+    return {
+      bankBalance,
+      cashBalance,
+      savingsBalance,
+      lockerBalance,
+      investmentsValue,
+      goldValue,
+      lentMoney,
+      goalsSaved,
+      borrowings: borrowingBal,
+      totalAssets,
+      totalLiabilities,
+      netWorth,
+      chartData,
+    };
+  }, [accounts, investments, lendings, borrowings, goals]);
 
   if (loading) {
     return (

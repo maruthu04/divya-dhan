@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getLendings, addLending, addLendingPayment, deleteLending } from '@/actions/debt';
+import { addLending, addLendingPayment, deleteLending } from '@/actions/debt';
+import { useData } from '@/components/dashboard/data-provider';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { HandCoins, Plus, X, Clock, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, Trash2, Loader2, Coins } from 'lucide-react';
@@ -13,8 +14,7 @@ const statusConfig: Record<string, any> = {
 };
 
 export default function LendingPage() {
-  const [lendings, setLendings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { lendings, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -26,13 +26,6 @@ export default function LendingPage() {
 
   // Add Payment Form state
   const [paymentAmount, setPaymentAmount] = useState('');
-
-  const loadData = async () => {
-    setLoading(true);
-    const data = await getLendings();
-    setLendings(data);
-    setLoading(false);
-  };
 
   useEffect(() => {
     loadData();

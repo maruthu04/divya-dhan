@@ -7,9 +7,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
-  getSubscriptions, addSubscription, updateSubscription, 
+  addSubscription, updateSubscription, 
   toggleSubscriptionActive, deleteSubscription 
 } from '@/actions/subscriptions';
+import { useData } from '@/components/dashboard/data-provider';
 
 const CATEGORIES = [
   { value: 'Entertainment', label: 'Entertainment', icon: Tv, color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.1)' },
@@ -20,8 +21,7 @@ const CATEGORIES = [
 ];
 
 export default function SubscriptionsPage() {
-  const [subscriptions, setSubscriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { subscriptions, loading, refetch: loadData } = useData();
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -35,18 +35,6 @@ export default function SubscriptionsPage() {
     startDate: new Date().toISOString().split('T')[0],
     notes: '',
   });
-
-  const loadData = async () => {
-    try {
-      const res = await getSubscriptions();
-      setSubscriptions(res);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load subscriptions.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     loadData();

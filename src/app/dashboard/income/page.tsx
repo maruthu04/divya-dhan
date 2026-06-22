@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getIncomes, addIncome, deleteIncome } from '@/actions/income';
+import { addIncome, deleteIncome } from '@/actions/income';
+import { useData } from '@/components/dashboard/data-provider';
 import { INCOME_SOURCES, CHART_COLORS } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -15,8 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const iconMap: Record<string, any> = { Briefcase, Laptop, Building2, BarChart3, Home, Percent, Coins, MoreHorizontal };
 
 export default function IncomePage() {
-  const [incomes, setIncomes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { incomes, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterSource, setFilterSource] = useState<string>('all');
 
@@ -27,19 +27,8 @@ export default function IncomePage() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [recurring, setRecurring] = useState(false);
 
-  const loadData = async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
-    const data = await getIncomes();
-    setIncomes(data);
-    if (isInitial) {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadData(true);
+    loadData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

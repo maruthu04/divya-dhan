@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getExpenses, addExpense, deleteExpense } from '@/actions/expenses';
+import { addExpense, deleteExpense } from '@/actions/expenses';
+import { useData } from '@/components/dashboard/data-provider';
 import { EXPENSE_CATEGORIES } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -15,8 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const iconMap: Record<string, any> = { UtensilsCrossed, ShoppingBag, Plane, Receipt, Heart, GraduationCap, Gamepad2, Home, ShoppingCart, Car, Zap, MoreHorizontal, TrendingUp };
 
 export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { expenses, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
@@ -27,19 +27,8 @@ export default function ExpensesPage() {
   const [merchant, setMerchant] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const loadData = async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
-    const data = await getExpenses();
-    setExpenses(data);
-    if (isInitial) {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadData(true);
+    loadData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

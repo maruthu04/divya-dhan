@@ -4,6 +4,7 @@ import MobileNav from '@/components/layout/mobile-nav';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import OnboardingOverlay from '@/components/dashboard/onboarding-overlay';
+import { DataProvider } from '@/components/dashboard/data-provider';
 
 export default async function DashboardLayout({
   children,
@@ -41,7 +42,9 @@ export default async function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         <Topbar user={user} />
         <main className="flex-1 p-4 md:p-6 pb-24 lg:pb-6 overflow-x-hidden">
-          {children}
+          <DataProvider>
+            {children}
+          </DataProvider>
         </main>
       </div>
       <MobileNav />
