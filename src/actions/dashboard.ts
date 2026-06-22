@@ -44,7 +44,7 @@ export async function getDashboardData() {
 
     const dbUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true }
+      select: { name: true, monthlyBudget: true }
     });
 
     return {
@@ -59,6 +59,7 @@ export async function getDashboardData() {
       user: {
         name: dbUser?.name || session?.user?.name || 'User',
         email: session?.user?.email,
+        monthlyBudget: dbUser?.monthlyBudget || null,
         id: userId,
       }
     };

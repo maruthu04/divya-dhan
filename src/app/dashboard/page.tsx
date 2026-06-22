@@ -93,6 +93,14 @@ export default function DashboardPage() {
     cashFlowHistory: [],
     expenseBreakdown: [],
     healthScore: 75,
+    healthFactors: {
+      savings: 0,
+      debt: 0,
+      emergency: 0,
+      diversity: 0,
+      spending: 0,
+    },
+    monthlyBudget: null,
     userName: 'User',
     // Daily
     todayIncome: 0,
@@ -458,6 +466,14 @@ export default function DashboardPage() {
         cashFlowHistory,
         expenseBreakdown,
         healthScore: Math.min(100, healthScore),
+        healthFactors: {
+          savings: savingsScore,
+          debt: debtScore,
+          emergency: emergencyScore,
+          diversity: diversityScore,
+          spending: spendingScore,
+        },
+        monthlyBudget: userSession?.monthlyBudget || null,
         userName: userSession?.name || 'User',
         // Daily
         todayIncome,
@@ -632,8 +648,8 @@ export default function DashboardPage() {
 
       {/* Bottom Row: Expense Breakdown + Health Score + Recent Transactions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ExpenseBreakdown data={dashboardData.expenseBreakdown} />
-        <HealthGauge score={dashboardData.healthScore} />
+        <ExpenseBreakdown data={dashboardData.expenseBreakdown} monthlyBudget={dashboardData.monthlyBudget} />
+        <HealthGauge score={dashboardData.healthScore} factors={dashboardData.healthFactors} />
         <RecentTransactions transactions={dashboardData.recentTransactions} />
       </div>
     </div>
