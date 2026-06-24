@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 import PWARegister from '@/components/pwa-register';
+import PWAInstallBanner from '@/components/pwa-install-banner';
 import type { Viewport } from 'next';
 import './globals.css';
 
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <Toaster richColors position="top-right" closeButton />
           <PWARegister />
+          <PWAInstallBanner />
         </ThemeProvider>
       </body>
     </html>
