@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { processSIPRollovers } from './investments';
 
 export async function getDashboardData() {
   try {
@@ -10,6 +11,9 @@ export async function getDashboardData() {
     if (!userId) {
       throw new Error('Unauthorized');
     }
+
+    // Process SIP rollovers first
+    await processSIPRollovers(userId);
 
     const [incomes, expenses, accounts, investments, lendings, borrowings, goals, notes, subscriptions] = await Promise.all([
       prisma.income.findMany({

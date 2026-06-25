@@ -207,6 +207,7 @@ export default function InvestmentsPage() {
   const [isSIP, setIsSIP] = useState(false);
   const [sipAmount, setSipAmount] = useState('');
   const [sipStartDate, setSipStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [deductFromBank, setDeductFromBank] = useState(true);
 
   useEffect(() => {
     loadData();
@@ -227,11 +228,13 @@ export default function InvestmentsPage() {
         isSIP: true,
         sipAmount: Number(sipAmount),
         sipStartDate,
+        deductFromBank,
       });
       if (!res.error) {
         setName(''); setSipAmount(''); setNotes('');
         setSipStartDate(new Date().toISOString().split('T')[0]);
         setIsSIP(false);
+        setDeductFromBank(true);
         setShowForm(false);
         loadData();
       }
@@ -244,9 +247,11 @@ export default function InvestmentsPage() {
         currentValue: Number(currentValue),
         buyDate: new Date().toISOString().split('T')[0],
         notes,
+        deductFromBank,
       });
       if (!res.error) {
         setName(''); setInvestedAmount(''); setCurrentValue(''); setNotes('');
+        setDeductFromBank(true);
         setShowForm(false);
         loadData();
       }
@@ -513,12 +518,12 @@ export default function InvestmentsPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => { setShowForm(false); setIsSIP(false); setDeductFromBank(true); }}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative bg-surface border border-border rounded-2xl p-6 w-full max-w-md animate-slide-up shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-text">Add Investment</h2>
-              <button onClick={() => { setShowForm(false); setIsSIP(false); }} className="p-1 rounded-lg hover:bg-surface-hover cursor-pointer"><X className="w-5 h-5 text-text-muted" /></button>
+              <button onClick={() => { setShowForm(false); setIsSIP(false); setDeductFromBank(true); }} className="p-1 rounded-lg hover:bg-surface-hover cursor-pointer"><X className="w-5 h-5 text-text-muted" /></button>
             </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
@@ -620,6 +625,20 @@ export default function InvestmentsPage() {
                   </div>
                 </>
               )}
+
+              {/* Deduct from Bank Account Checkbox */}
+              <div className="flex items-center gap-2 py-1 select-none">
+                <input
+                  type="checkbox"
+                  id="deductFromBank"
+                  checked={deductFromBank}
+                  onChange={e => setDeductFromBank(e.target.checked)}
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary/20 accent-primary"
+                />
+                <label htmlFor="deductFromBank" className="text-xs font-medium text-text-secondary cursor-pointer">
+                  Deduct from Bank Account Balance
+                </label>
+              </div>
 
               <div>
                 <label className="block text-xs font-medium text-text-secondary mb-1.5">Notes (Optional)</label>

@@ -123,6 +123,8 @@ model Investment {
   isSIP          Boolean  @default(false)
   sipAmount      Float?
   sipStartDate   DateTime?
+  deductFromBank Boolean  @default(true)
+  lastDeductedMonth DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
