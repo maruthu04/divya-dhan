@@ -64,6 +64,7 @@ export interface LendingPayment {
   amount: number;
   date: string;
   note?: string;
+  createdAt?: string;
 }
 
 export interface Lending {
@@ -86,6 +87,7 @@ export interface BorrowingRepayment {
   amount: number;
   date: string;
   note?: string;
+  createdAt?: string;
 }
 
 export interface Borrowing {

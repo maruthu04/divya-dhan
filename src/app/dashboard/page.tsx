@@ -152,6 +152,7 @@ export default function DashboardPage() {
               amount: r.amount,
               date: r.date,
               note: r.note,
+              createdAt: r.createdAt,
             });
           });
         }
@@ -168,6 +169,7 @@ export default function DashboardPage() {
               amount: p.amount,
               date: p.date,
               note: p.note,
+              createdAt: p.createdAt,
             });
           });
         }
