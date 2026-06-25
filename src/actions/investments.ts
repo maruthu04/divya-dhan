@@ -219,3 +219,69 @@ export async function deleteInvestment(id: string) {
     return { error: error.message || 'Failed to delete investment' };
   }
 }
+
+export async function updateInvestment(
+  id: string,
+  data: {
+    name: string;
+    type: string;
+    investedAmount: number;
+    currentValue: number;
+    units?: number;
+    buyPrice?: number;
+    buyDate: string;
+    notes?: string;
+    isSIP?: boolean;
+    sipAmount?: number;
+    sipStartDate?: string;
+  }
+) {
+  try {
+    const userId = await getSessionUser();
+    const existing = await prisma.investment.findUnique({ where: { id } });
+
+    if (!existing || existing.userId !== userId) {
+      return { error: 'Not authorized to update this record' };
+    }
+
+    let investedAmount = Number(data.investedAmount);
+    let currentValue = Number(data.currentValue);
+    let lastDeductedMonth = existing.lastDeductedMonth;
+
+    if (data.isSIP && data.sipAmount && data.sipStartDate) {
+      // If it transitioned from non-SIP to SIP, initialize lastDeductedMonth
+      if (!existing.isSIP) {
+        const now = new Date();
+        lastDeductedMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+    } else {
+      lastDeductedMonth = null;
+    }
+
+    const result = await prisma.investment.update({
+      where: { id },
+      data: {
+        name: data.name,
+        type: data.type,
+        investedAmount,
+        currentValue,
+        units: data.units ? Number(data.units) : null,
+        buyPrice: data.buyPrice ? Number(data.buyPrice) : null,
+        buyDate: new Date(data.buyDate),
+        notes: data.notes || '',
+        isSIP: data.isSIP || false,
+        sipAmount: data.isSIP && data.sipAmount ? Number(data.sipAmount) : null,
+        sipStartDate: data.isSIP && data.sipStartDate ? new Date(data.sipStartDate) : null,
+        lastDeductedMonth,
+      },
+    });
+
+    revalidatePath('/dashboard/investments');
+    revalidatePath('/dashboard');
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error('Error updating investment:', error);
+    return { error: error.message || 'Failed to update investment' };
+  }
+}
+

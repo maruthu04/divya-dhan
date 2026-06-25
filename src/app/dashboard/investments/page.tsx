@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { addInvestment, deleteInvestment } from '@/actions/investments';
+import { addInvestment, deleteInvestment, updateInvestment } from '@/actions/investments';
 import { useData } from '@/components/dashboard/data-provider';
 import { INVESTMENT_TYPES } from '@/lib/constants';
 import { formatCurrency, formatPercentage } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Plus, X, Trash2, Loader2, RefreshCw, CalendarClock } from 'lucide-react';
+import { TrendingUp, TrendingDown, Plus, X, Trash2, Loader2, RefreshCw, CalendarClock, Pencil } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 // SIP Future Value: FV = P × [((1 + r)^n - 1) / r] × (1 + r)
@@ -209,6 +209,18 @@ export default function InvestmentsPage() {
   const [sipStartDate, setSipStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [deductFromBank, setDeductFromBank] = useState(true);
 
+  // Edit states
+  const [editingInvestment, setEditingInvestment] = useState<any | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState('stocks');
+  const [editInvestedAmount, setEditInvestedAmount] = useState('');
+  const [editCurrentValue, setEditCurrentValue] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editIsSIP, setEditIsSIP] = useState(false);
+  const [editSipAmount, setEditSipAmount] = useState('');
+  const [editSipStartDate, setEditSipStartDate] = useState('');
+  const [editBuyDate, setEditBuyDate] = useState('');
+
   useEffect(() => {
     loadData();
   }, []);
@@ -258,6 +270,57 @@ export default function InvestmentsPage() {
     }
   };
 
+  const handleEditClick = (inv: any) => {
+    setEditingInvestment(inv);
+    setEditName(inv.name);
+    setEditType(inv.type);
+    setEditInvestedAmount(inv.investedAmount.toString());
+    setEditCurrentValue(inv.currentValue.toString());
+    setEditNotes(inv.notes || '');
+    setEditIsSIP(inv.isSIP || false);
+    setEditSipAmount(inv.sipAmount ? inv.sipAmount.toString() : '');
+    setEditSipStartDate(inv.sipStartDate ? new Date(inv.sipStartDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+    setEditBuyDate(inv.buyDate ? new Date(inv.buyDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingInvestment) return;
+
+    if (editIsSIP) {
+      if (!editName || !editSipAmount || !editCurrentValue) return;
+      const res = await updateInvestment(editingInvestment.id, {
+        name: editName,
+        type: editType,
+        investedAmount: Number(editInvestedAmount) || 0,
+        currentValue: Number(editCurrentValue),
+        notes: editNotes,
+        isSIP: true,
+        sipAmount: Number(editSipAmount),
+        sipStartDate: editSipStartDate,
+        buyDate: editSipStartDate,
+      });
+      if (!res.error) {
+        setEditingInvestment(null);
+        loadData();
+      }
+    } else {
+      if (!editName || !editInvestedAmount || !editCurrentValue) return;
+      const res = await updateInvestment(editingInvestment.id, {
+        name: editName,
+        type: editType,
+        investedAmount: Number(editInvestedAmount),
+        currentValue: Number(editCurrentValue),
+        notes: editNotes,
+        buyDate: editBuyDate,
+      });
+      if (!res.error) {
+        setEditingInvestment(null);
+        loadData();
+      }
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this investment?')) {
       const res = await deleteInvestment(id);
@@ -273,8 +336,8 @@ export default function InvestmentsPage() {
       const computed = computeSIPValues(inv.sipAmount, new Date(inv.sipStartDate));
       return {
         ...inv,
-        investedAmount: computed.investedAmount,
-        currentValue: computed.currentValue,
+        investedAmount: inv.investedAmount !== undefined && inv.investedAmount !== null ? inv.investedAmount : computed.investedAmount,
+        currentValue: inv.currentValue !== undefined && inv.currentValue !== null ? inv.currentValue : computed.currentValue,
         monthsElapsed: computed.monthsElapsed,
       };
     }
@@ -307,12 +370,18 @@ export default function InvestmentsPage() {
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 animate-fade-in">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2"><TrendingUp className="w-6 h-6 text-success" /> Investment Portfolio</h1>
           <p className="text-sm text-text-muted mt-1">Track stocks, mutual funds, gold, crypto and more</p>
+          <div className="mt-3 p-3 bg-info-muted/10 border border-info/20 rounded-xl flex items-start gap-2.5 max-w-2xl">
+            <CalendarClock className="w-4.5 h-4.5 text-info flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-text-secondary leading-relaxed">
+              <span className="font-semibold text-info">Reminder:</span> Make sure to update the current value, gains, and loss of your stocks and mutual funds every week to ensure your wealth dashboard reflects accurate performance.
+            </p>
+          </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-background text-sm font-medium rounded-lg transition-colors cursor-pointer"><Plus className="w-4 h-4" /> Add Investment</button>
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-background text-sm font-medium rounded-lg transition-colors cursor-pointer self-start lg:self-center"><Plus className="w-4 h-4" /> Add Investment</button>
       </div>
 
       {loading ? (
@@ -494,13 +563,22 @@ export default function InvestmentsPage() {
                       </div>
                     </td>
                     <td className="px-5 py-3.5 text-right">
-                      <button
-                        onClick={() => handleDelete(inv.id)}
-                        className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
-                        title="Delete record"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleEditClick(inv)}
+                          className="p-1 text-text-muted hover:text-primary rounded hover:bg-primary/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
+                          title="Edit record"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(inv.id)}
+                          className="p-1 text-text-muted hover:text-danger rounded hover:bg-danger/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
+                          title="Delete record"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -646,6 +724,112 @@ export default function InvestmentsPage() {
               </div>
               <button type="submit" className="w-full py-2.5 bg-primary hover:bg-primary-hover text-background font-medium rounded-lg transition-colors cursor-pointer">
                 {isSIP ? 'Start SIP' : 'Add Investment'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingInvestment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEditingInvestment(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative bg-surface border border-border rounded-2xl p-6 w-full max-w-md animate-slide-up shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-text">Edit Investment</h2>
+              <button onClick={() => setEditingInvestment(null)} className="p-1 rounded-lg hover:bg-surface-hover cursor-pointer"><X className="w-5 h-5 text-text-muted" /></button>
+            </div>
+            <form className="space-y-4" onSubmit={handleEditSubmit}>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Name</label>
+                <input type="text" value={editName} onChange={e => setEditName(e.target.value)} required placeholder="e.g. SBI Bluechip Fund" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Type</label>
+                <select value={editType} onChange={e => setEditType(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50">
+                  {INVESTMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-2">Investment Mode</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditIsSIP(false)}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg border transition-all cursor-pointer',
+                      !editIsSIP
+                        ? 'bg-primary/10 border-primary/30 text-primary'
+                        : 'border-border text-text-secondary hover:bg-surface-hover'
+                    )}
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    One-time
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditIsSIP(true)}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg border transition-all cursor-pointer',
+                      editIsSIP
+                        ? 'bg-info-muted border-info/30 text-info'
+                        : 'border-border text-text-secondary hover:bg-surface-hover'
+                    )}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Monthly SIP
+                  </button>
+                </div>
+              </div>
+
+              {editIsSIP ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">SIP Amount (₹/month)</label>
+                      <input type="number" value={editSipAmount} onChange={e => setEditSipAmount(e.target.value)} required placeholder="500" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">SIP Start Date</label>
+                      <input type="date" value={editSipStartDate} onChange={e => setEditSipStartDate(e.target.value)} required className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-text-secondary mb-1.5">Current Value (₹)</label>
+                    <input type="number" value={editCurrentValue} onChange={e => setEditCurrentValue(e.target.value)} required placeholder="0" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">Invested (₹)</label>
+                      <input type="number" value={editInvestedAmount} onChange={e => setEditInvestedAmount(e.target.value)} required placeholder="0" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">Buy Date</label>
+                      <input type="date" value={editBuyDate} onChange={e => setEditBuyDate(e.target.value)} required className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-text-secondary mb-1.5">Current Value (₹)</label>
+                    <input type="number" value={editCurrentValue} onChange={e => setEditCurrentValue(e.target.value)} required placeholder="0" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Notes (Optional)</label>
+                <textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} placeholder="Purchase details..." rows={3} className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50 resize-none" />
+              </div>
+              <div className="text-[11px] leading-relaxed text-text-muted bg-surface-hover/50 border border-border/40 p-2.5 rounded-lg flex items-start gap-2 select-none">
+                <span className="font-semibold text-info flex-shrink-0">Reminder:</span>
+                <span>Do update the current value/gains and loss of the stocks and mutual funds every week.</span>
+              </div>
+
+              <button type="submit" className="w-full py-2.5 bg-primary hover:bg-primary-hover text-background font-medium rounded-lg transition-colors cursor-pointer">
+                Save Changes
               </button>
             </form>
           </div>
