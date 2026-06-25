@@ -3,8 +3,8 @@
 // ============================================
 
 // ---- Income ----
-export type IncomeSource = 
-  | 'salary' | 'freelance' | 'business' | 'trading' 
+export type IncomeSource =
+  | 'salary' | 'freelance' | 'business' | 'trading'
   | 'rental' | 'interest' | 'dividend' | 'other';
 
 export interface Income {
@@ -22,8 +22,8 @@ export interface Income {
 }
 
 // ---- Expenses ----
-export type ExpenseCategory = 
-  | 'food' | 'shopping' | 'travel' | 'bills' | 'medical' 
+export type ExpenseCategory =
+  | 'food' | 'shopping' | 'travel' | 'bills' | 'medical'
   | 'education' | 'entertainment' | 'investments' | 'rent'
   | 'groceries' | 'transport' | 'utilities' | 'others';
 
@@ -103,8 +103,8 @@ export interface Borrowing {
 }
 
 // ---- Investments ----
-export type InvestmentType = 
-  | 'stocks' | 'mutual_funds' | 'etfs' | 'gold' 
+export type InvestmentType =
+  | 'stocks' | 'mutual_funds' | 'etfs' | 'gold'
   | 'crypto' | 'fixed_deposit' | 'bonds' | 'real_estate' | 'other';
 
 export interface Investment {
@@ -123,8 +123,8 @@ export interface Investment {
 }
 
 // ---- Goals ----
-export type GoalCategory = 
-  | 'house' | 'car' | 'emergency_fund' | 'retirement' 
+export type GoalCategory =
+  | 'house' | 'car' | 'emergency_fund' | 'retirement'
   | 'education' | 'travel' | 'wedding' | 'business' | 'custom';
 
 export interface Goal {
@@ -143,8 +143,8 @@ export interface Goal {
 }
 
 // ---- Notes ----
-export type NoteCategory = 
-  | 'financial_journal' | 'tax_notes' | 'investment_ideas' 
+export type NoteCategory =
+  | 'financial_journal' | 'tax_notes' | 'investment_ideas'
   | 'general' | 'reminders' | 'research';
 
 export interface Note {
@@ -160,25 +160,14 @@ export interface Note {
 }
 
 // ---- Net Worth ----
-export interface NetWorthSnapshot {
+export interface NetWorth {
   id: string;
   userId: string;
   totalAssets: number;
   totalLiabilities: number;
   netWorth: number;
-  breakdown: {
-    bank: number;
-    cash: number;
-    investments: number;
-    gold: number;
-    property: number;
-    lentMoney: number;
-    loans: number;
-    creditCards: number;
-    borrowings: number;
-  };
-  date: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 // ---- Financial Health ----

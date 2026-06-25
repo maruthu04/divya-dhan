@@ -4,7 +4,7 @@
 
 import type {
   Income, Expense, BankAccount, Lending, Borrowing,
-  Investment, Goal, Note, NetWorthSnapshot, HealthScore,
+  Investment, Goal, Note, NetWorth, HealthScore,
   MonthlyReport, DashboardData
 } from '@/types';
 

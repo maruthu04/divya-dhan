@@ -113,7 +113,7 @@ export default function NetWorthPage() {
               <defs><linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#00C896" stopOpacity={0.3} /><stop offset="95%" stopColor="#00C896" stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} tickFormatter={v => `₹${(v/100000).toFixed(0)}L`} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} tickFormatter={v => `₹${(v / 100000).toFixed(0)}L`} />
               <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #1E293B', borderRadius: '8px' }} formatter={(v: any) => [formatCurrency(v), 'Net Worth']} />
               <Area type="monotone" dataKey="value" stroke="#00C896" strokeWidth={2.5} fill="url(#nwGrad)" dot={false} activeDot={{ r: 5, fill: '#00C896', stroke: '#020617', strokeWidth: 2 }} />
             </AreaChart>

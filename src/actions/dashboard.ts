@@ -60,6 +60,35 @@ export async function getDashboardData() {
       select: { name: true, monthlyBudget: true }
     });
 
+    // Calculate current net worth figures
+    const bankBalance = accounts.filter((a: any) => a.type === 'bank').reduce((s: number, a: any) => s + a.balance, 0);
+    const cashBalance = accounts.filter((a: any) => a.type === 'wallet').reduce((s: number, a: any) => s + a.balance, 0);
+    const savingsBalance = accounts.filter((a: any) => a.type === 'savings').reduce((s: number, a: any) => s + a.balance, 0);
+    const lockerBalance = accounts.filter((a: any) => a.type === 'locker').reduce((s: number, a: any) => s + a.balance, 0);
+    const investmentsValue = investments.reduce((s: number, i: any) => s + i.currentValue, 0);
+    const lentMoney = lendings.reduce((s: number, l: any) => s + l.remainingBalance, 0);
+    const goalsSaved = goals.reduce((s: number, g: any) => s + g.currentAmount, 0);
+    const totalAssets = bankBalance + cashBalance + savingsBalance + lockerBalance + investmentsValue + lentMoney + goalsSaved;
+
+    const totalLiabilities = borrowings.reduce((s: number, b: any) => s + b.remainingBalance, 0);
+    const netWorth = totalAssets - totalLiabilities;
+
+    // Upsert the single NetWorth document for this user (only 1 record per user in the collection)
+    await prisma.netWorth.upsert({
+      where: { userId },
+      update: {
+        totalAssets,
+        totalLiabilities,
+        netWorth,
+      },
+      create: {
+        userId,
+        totalAssets,
+        totalLiabilities,
+        netWorth,
+      },
+    });
+
     return {
       success: true,
       incomes,

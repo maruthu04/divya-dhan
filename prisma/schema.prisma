@@ -25,7 +25,7 @@ model User {
   notes             Note[]
   lendings          Lending[]
   borrowings        Borrowing[]
-  netWorthSnapshots NetWorthSnapshot[]
+  netWorth          NetWorth?
   healthScores      HealthScore[]
   reports           MonthlyReport[]
   subscriptions     Subscription[]
@@ -156,16 +156,15 @@ model Note {
   updatedAt DateTime @updatedAt
 }
 
-model NetWorthSnapshot {
+model NetWorth {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String   @db.ObjectId
+  userId           String   @unique @db.ObjectId
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   totalAssets      Float
   totalLiabilities Float
   netWorth         Float
-  breakdown        Json     // { bank, cash, investments, gold, property, lentMoney, loans, creditCards, borrowings }
-  date             DateTime
   createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model HealthScore {
