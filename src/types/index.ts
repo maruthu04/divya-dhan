@@ -17,6 +17,8 @@ export interface Income {
   recurring: boolean;
   createdAt: string;
   updatedAt: string;
+  bankAccountId?: string;
+  bankAccount?: BankAccount;
 }
 
 // ---- Expenses ----
@@ -35,6 +37,8 @@ export interface Expense {
   date: string;
   createdAt: string;
   updatedAt: string;
+  bankAccountId?: string;
+  bankAccount?: BankAccount;
 }
 
 // ---- Bank Accounts ----

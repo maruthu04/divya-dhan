@@ -18,6 +18,9 @@ export async function getIncomes() {
     const userId = await getSessionUser();
     return await prisma.income.findMany({
       where: { userId },
+      include: {
+        bankAccount: true,
+      },
       orderBy: { date: 'desc' },
     });
   } catch (error) {
@@ -32,6 +35,7 @@ export async function addIncome(data: {
   description: string;
   date: string;
   recurring: boolean;
+  bankAccountId?: string;
 }) {
   try {
     const userId = await getSessionUser();
@@ -43,18 +47,27 @@ export async function addIncome(data: {
         description: data.description,
         date: new Date(data.date),
         recurring: data.recurring,
+        bankAccountId: data.bankAccountId || null,
       },
     });
 
     // Automatically update the BankAccount balance if it exists
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
+    const targetAccountId = data.bankAccountId;
+    if (targetAccountId) {
       await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
+        where: { id: targetAccountId },
         data: { balance: { increment: Number(data.amount) } },
       });
+    } else {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
+      });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { increment: Number(data.amount) } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/income');
@@ -78,14 +91,22 @@ export async function deleteIncome(id: string) {
     await prisma.income.delete({ where: { id } });
 
     // Revert account balance
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
+    const targetAccountId = record.bankAccountId;
+    if (targetAccountId) {
       await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
+        where: { id: targetAccountId },
         data: { balance: { decrement: record.amount } },
       });
+    } else {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
+      });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { decrement: record.amount } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/income');

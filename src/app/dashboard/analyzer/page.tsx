@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   FileSearch, Upload, FileText, CheckCircle2, AlertTriangle, 
   CreditCard, TrendingDown, ArrowUpRight, ArrowDownLeft, Sparkles,
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
 import { addExpensesBulk } from '@/actions/expenses';
+import { useData } from '@/components/dashboard/data-provider';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
@@ -29,6 +30,7 @@ interface AnalysisResults {
 }
 
 export default function AnalyzerPage() {
+  const { accounts } = useData();
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [loadingStep, setLoadingStep] = useState('');
@@ -37,6 +39,16 @@ export default function AnalyzerPage() {
   const [importing, setImporting] = useState(false);
   const [activeTab, setActiveTab] = useState<'expenses' | 'all' | 'income'>('expenses');
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [selectedAccountId, setSelectedAccountId] = useState('');
+
+  useEffect(() => {
+    if (accounts && accounts.length > 0 && !selectedAccountId) {
+      const defaultAcc = accounts.find((a: any) => a.type === 'bank') || accounts[0];
+      if (defaultAcc) {
+        setSelectedAccountId(defaultAcc.id);
+      }
+    }
+  }, [accounts, selectedAccountId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -177,7 +189,7 @@ export default function AnalyzerPage() {
         };
       });
 
-      const res = await addExpensesBulk(expensesToImport);
+      const res = await addExpensesBulk(expensesToImport, selectedAccountId || undefined);
 
       if (res.error) {
         throw new Error(res.error);
@@ -275,7 +287,7 @@ export default function AnalyzerPage() {
           </div>
 
           {file && (
-            <div className="mt-4 bg-surface border border-border rounded-xl p-4 flex items-center justify-between animate-slide-up">
+            <div className="mt-4 bg-surface border border-border rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-slide-up">
               <div className="flex items-center gap-3">
                 <FileText className="w-8 h-8 text-ai" />
                 <div>
@@ -283,23 +295,39 @@ export default function AnalyzerPage() {
                   <p className="text-xs text-text-muted">{(file.size / 1024).toFixed(1)} KB • {file.name.split('.').pop()?.toUpperCase()}</p>
                 </div>
               </div>
-              <button
-                onClick={handleAnalyze}
-                disabled={analyzing}
-                className="px-5 py-2.5 bg-ai hover:bg-ai/90 text-background text-sm font-semibold rounded-lg transition-all shadow-lg shadow-ai/10 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-              >
-                {analyzing ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-                    <span>{loadingStep}</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Analyze Statement</span>
-                  </>
-                )}
-              </button>
+              
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="flex flex-col gap-1 min-w-[200px]">
+                  <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Statement Account</label>
+                  <select
+                    value={selectedAccountId}
+                    onChange={e => setSelectedAccountId(e.target.value)}
+                    className="px-3 py-2 bg-background border border-border rounded-lg text-xs text-text focus:outline-none focus:border-primary/50"
+                  >
+                    {accounts.map((a: any) => (
+                      <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <button
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                  className="px-5 py-2 bg-ai hover:bg-ai/90 text-background text-sm font-semibold rounded-lg transition-all shadow-lg shadow-ai/10 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer h-[38px] mt-auto"
+                >
+                  {analyzing ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                      <span className="whitespace-nowrap">{loadingStep}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span className="whitespace-nowrap">Analyze Statement</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -401,12 +429,26 @@ export default function AnalyzerPage() {
                 <p className="text-xs text-text-muted mt-0.5">Select statement entries to import as expenses in your database</p>
               </div>
 
-              {/* Import Action */}
-              <button
-                onClick={handleImport}
-                disabled={importing || selectedTxIdxs.length === 0}
-                className="px-4 py-2 bg-primary hover:bg-primary/90 text-background text-sm font-bold rounded-lg transition-all shadow-lg shadow-primary/10 disabled:opacity-50 flex items-center gap-2 cursor-pointer shrink-0"
-              >
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex flex-col gap-1 min-w-[180px]">
+                  <label className="text-[9px] font-bold text-text-muted uppercase tracking-wider">Import To Account</label>
+                  <select
+                    value={selectedAccountId}
+                    onChange={e => setSelectedAccountId(e.target.value)}
+                    className="px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs text-text focus:outline-none focus:border-primary/50"
+                  >
+                    {accounts.map((a: any) => (
+                      <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Import Action */}
+                <button
+                  onClick={handleImport}
+                  disabled={importing || selectedTxIdxs.length === 0}
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-background text-sm font-bold rounded-lg transition-all shadow-lg shadow-primary/10 disabled:opacity-50 flex items-center gap-2 cursor-pointer shrink-0 h-[38px]"
+                >
                 {importing ? (
                   <>
                     <span className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
@@ -420,6 +462,7 @@ export default function AnalyzerPage() {
                 )}
               </button>
             </div>
+          </div>
 
             {/* Tabs & Table Header actions */}
             <div className="px-5 py-3 border-b border-border flex justify-between items-center bg-background/50">

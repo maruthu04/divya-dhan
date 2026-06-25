@@ -16,7 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const iconMap: Record<string, any> = { UtensilsCrossed, ShoppingBag, Plane, Receipt, Heart, GraduationCap, Gamepad2, Home, ShoppingCart, Car, Zap, MoreHorizontal, TrendingUp };
 
 export default function ExpensesPage() {
-  const { expenses, loading, refetch: loadData } = useData();
+  const { expenses, accounts, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
@@ -26,6 +26,16 @@ export default function ExpensesPage() {
   const [description, setDescription] = useState('');
   const [merchant, setMerchant] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [accountId, setAccountId] = useState('');
+
+  useEffect(() => {
+    if (accounts && accounts.length > 0) {
+      const defaultAcc = accounts.find((a: any) => a.type === 'bank') || accounts[0];
+      if (defaultAcc && !accountId) {
+        setAccountId(defaultAcc.id);
+      }
+    }
+  }, [accounts, accountId]);
 
   useEffect(() => {
     loadData();
@@ -41,6 +51,7 @@ export default function ExpensesPage() {
       description,
       merchant,
       date,
+      bankAccountId: accountId || undefined,
     });
 
     if (!res.error) {
@@ -265,6 +276,14 @@ export default function ExpensesPage() {
                 <label className="block text-xs font-medium text-text-secondary mb-1.5">Category</label>
                 <select value={category} onChange={e => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50">
                   {EXPENSE_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Paid From (Account/Wallet)</label>
+                <select value={accountId} onChange={e => setAccountId(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50">
+                  {accounts.map((a: any) => (
+                    <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                  ))}
                 </select>
               </div>
               <div>

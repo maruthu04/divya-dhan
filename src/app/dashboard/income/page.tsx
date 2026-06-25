@@ -16,7 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const iconMap: Record<string, any> = { Briefcase, Laptop, Building2, BarChart3, Home, Percent, Coins, MoreHorizontal };
 
 export default function IncomePage() {
-  const { incomes, loading, refetch: loadData } = useData();
+  const { incomes, accounts, loading, refetch: loadData } = useData();
   const [showForm, setShowForm] = useState(false);
   const [filterSource, setFilterSource] = useState<string>('all');
 
@@ -26,6 +26,16 @@ export default function IncomePage() {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [recurring, setRecurring] = useState(false);
+  const [accountId, setAccountId] = useState('');
+
+  useEffect(() => {
+    if (accounts && accounts.length > 0) {
+      const defaultAcc = accounts.find((a: any) => a.type === 'bank') || accounts[0];
+      if (defaultAcc && !accountId) {
+        setAccountId(defaultAcc.id);
+      }
+    }
+  }, [accounts, accountId]);
 
   useEffect(() => {
     loadData();
@@ -41,6 +51,7 @@ export default function IncomePage() {
       description,
       date,
       recurring,
+      bankAccountId: accountId || undefined,
     });
 
     if (!res.error) {
@@ -303,6 +314,14 @@ export default function IncomePage() {
                 <label className="block text-xs font-medium text-text-secondary mb-1.5">Source</label>
                 <select value={source} onChange={e => setSource(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50">
                   {INCOME_SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Deposit To (Account/Wallet)</label>
+                <select value={accountId} onChange={e => setAccountId(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50">
+                  {accounts.map((a: any) => (
+                    <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                  ))}
                 </select>
               </div>
               <div>

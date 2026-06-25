@@ -18,6 +18,9 @@ export async function getExpenses() {
     const userId = await getSessionUser();
     return await prisma.expense.findMany({
       where: { userId },
+      include: {
+        bankAccount: true,
+      },
       orderBy: { date: 'desc' },
     });
   } catch (error) {
@@ -32,6 +35,7 @@ export async function addExpense(data: {
   description: string;
   merchant?: string;
   date: string;
+  bankAccountId?: string;
 }) {
   try {
     const userId = await getSessionUser();
@@ -43,18 +47,27 @@ export async function addExpense(data: {
         description: data.description,
         merchant: data.merchant || '',
         date: new Date(data.date),
+        bankAccountId: data.bankAccountId || null,
       },
     });
 
     // Automatically update the BankAccount balance (deduct)
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
+    const targetAccountId = data.bankAccountId;
+    if (targetAccountId) {
       await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
+        where: { id: targetAccountId },
         data: { balance: { decrement: Number(data.amount) } },
       });
+    } else {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
+      });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { decrement: Number(data.amount) } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/expenses');
@@ -78,14 +91,22 @@ export async function deleteExpense(id: string) {
     await prisma.expense.delete({ where: { id } });
 
     // Revert account balance
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
+    const targetAccountId = record.bankAccountId;
+    if (targetAccountId) {
       await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
+        where: { id: targetAccountId },
         data: { balance: { increment: record.amount } },
       });
+    } else {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
+      });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { increment: record.amount } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/expenses');
@@ -97,13 +118,16 @@ export async function deleteExpense(id: string) {
   }
 }
 
-export async function addExpensesBulk(expenses: {
-  category: string;
-  amount: number;
-  description: string;
-  merchant?: string;
-  date: string;
-}[]) {
+export async function addExpensesBulk(
+  expenses: {
+    category: string;
+    amount: number;
+    description: string;
+    merchant?: string;
+    date: string;
+  }[],
+  bankAccountId?: string
+) {
   try {
     const userId = await getSessionUser();
     const totalAmount = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
@@ -119,19 +143,28 @@ export async function addExpensesBulk(expenses: {
             description: exp.description,
             merchant: exp.merchant || '',
             date: new Date(exp.date),
+            bankAccountId: bankAccountId || null,
           }
         });
         results.push(res);
       }
 
-      const primaryAccount = await tx.bankAccount.findFirst({
-        where: { userId, type: 'bank' },
-      });
-      if (primaryAccount) {
+      const targetAccountId = bankAccountId;
+      if (targetAccountId) {
         await tx.bankAccount.update({
-          where: { id: primaryAccount.id },
+          where: { id: targetAccountId },
           data: { balance: { decrement: totalAmount } },
         });
+      } else {
+        const primaryAccount = await tx.bankAccount.findFirst({
+          where: { userId, type: 'bank' },
+        });
+        if (primaryAccount) {
+          await tx.bankAccount.update({
+            where: { id: primaryAccount.id },
+            data: { balance: { decrement: totalAmount } },
+          });
+        }
       }
 
       return results;

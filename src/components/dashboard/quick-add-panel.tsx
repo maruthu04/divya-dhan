@@ -6,6 +6,7 @@ import { INCOME_SOURCES, EXPENSE_CATEGORIES } from '@/lib/constants';
 import { addIncome } from '@/actions/income';
 import { addExpense } from '@/actions/expenses';
 import { addBorrowing, addLending, getBorrowings, getLendings, addBorrowingRepayment, addLendingPayment } from '@/actions/debt';
+import { useData } from '@/components/dashboard/data-provider';
 import {
   ArrowDownLeft, ArrowUpRight, HandCoins, Handshake, Plus,
   CheckCircle2, Loader2, Sparkles,
@@ -18,6 +19,7 @@ interface QuickAddPanelProps {
 }
 
 export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps) {
+  const { accounts } = useData();
   const [activeTab, setActiveTab] = useState<TabType>('income');
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -26,11 +28,13 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
   const [incomeSource, setIncomeSource] = useState('salary');
   const [incomeAmount, setIncomeAmount] = useState('');
   const [incomeDesc, setIncomeDesc] = useState('');
+  const [incomeAccountId, setIncomeAccountId] = useState('');
 
   // Expense fields
   const [expenseCategory, setExpenseCategory] = useState('food');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseDesc, setExpenseDesc] = useState('');
+  const [expenseAccountId, setExpenseAccountId] = useState('');
 
   // Borrowing fields
   const [lenderName, setLenderName] = useState('');
@@ -81,6 +85,16 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
     loadDebtData();
   }, []);
 
+  useEffect(() => {
+    if (accounts && accounts.length > 0) {
+      const defaultAcc = accounts.find((a: any) => a.type === 'bank') || accounts[0];
+      if (defaultAcc) {
+        if (!incomeAccountId) setIncomeAccountId(defaultAcc.id);
+        if (!expenseAccountId) setExpenseAccountId(defaultAcc.id);
+      }
+    }
+  }, [accounts, incomeAccountId, expenseAccountId]);
+
   const tabs = [
     { id: 'income' as TabType, label: 'Income', icon: <ArrowDownLeft className="w-3.5 h-3.5" />, color: '#22C55E' },
     { id: 'expense' as TabType, label: 'Expense', icon: <ArrowUpRight className="w-3.5 h-3.5" />, color: '#EF4444' },
@@ -113,6 +127,7 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
           description: incomeDesc,
           date: todayStr,
           recurring: false,
+          bankAccountId: incomeAccountId || undefined,
         });
       } else if (activeTab === 'expense') {
         if (!expenseAmount || !expenseDesc) return;
@@ -121,6 +136,7 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
           amount: Number(expenseAmount),
           description: expenseDesc,
           date: todayStr,
+          bankAccountId: expenseAccountId || undefined,
         });
       } else if (activeTab === 'borrowing') {
         if (borrowAction === 'new') {
@@ -252,6 +268,18 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
               />
             </div>
+            <div>
+              <label className="block text-[11px] font-medium text-text-muted mb-1">Deposit To (Account/Wallet)</label>
+              <select
+                value={incomeAccountId}
+                onChange={e => setIncomeAccountId(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
+              >
+                {accounts.map((a: any) => (
+                  <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
 
@@ -290,6 +318,18 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
                 placeholder="e.g. Lunch, Uber ride..."
                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
               />
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-text-muted mb-1">Paid From (Account/Wallet)</label>
+              <select
+                value={expenseAccountId}
+                onChange={e => setExpenseAccountId(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
+              >
+                {accounts.map((a: any) => (
+                  <option key={a.id} value={a.id}>{a.name} (₹{a.balance})</option>
+                ))}
+              </select>
             </div>
           </div>
         )}

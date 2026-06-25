@@ -14,10 +14,12 @@ export async function getDashboardData() {
     const [incomes, expenses, accounts, investments, lendings, borrowings, goals, notes, subscriptions] = await Promise.all([
       prisma.income.findMany({
         where: { userId },
+        include: { bankAccount: true },
         orderBy: { date: 'desc' },
       }),
       prisma.expense.findMany({
         where: { userId },
+        include: { bankAccount: true },
         orderBy: { date: 'desc' },
       }),
       prisma.bankAccount.findMany({

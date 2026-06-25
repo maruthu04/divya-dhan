@@ -11,6 +11,10 @@ interface Transaction {
   amount: number;
   category: string;
   date: string;
+  bankAccount?: {
+    name: string;
+    color: string;
+  };
 }
 
 interface RecentTransactionsProps {
@@ -52,7 +56,23 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-text truncate">{tx.description}</p>
-                  <p className="text-xs text-text-muted">{getRelativeTime(tx.date)}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <p className="text-xs text-text-muted">{getRelativeTime(tx.date)}</p>
+                    {tx.bankAccount && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-border" />
+                        <span 
+                          className="text-[10px] px-1.5 py-0.5 rounded font-medium"
+                          style={{ 
+                            backgroundColor: `${tx.bankAccount.color}15`, 
+                            color: tx.bankAccount.color 
+                          }}
+                        >
+                          {tx.bankAccount.name}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
               <span className={`text-sm font-semibold flex-shrink-0 ${isIncome ? 'text-success' : 'text-text'}`}>

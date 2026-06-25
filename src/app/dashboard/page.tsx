@@ -340,11 +340,13 @@ export default function DashboardPage() {
           id: i.id, type: 'income' as const, description: i.description,
           amount: i.amount, category: i.source, date: i.date,
           createdAt: i.createdAt || i.date,
+          bankAccount: i.bankAccount,
         })),
         ...expenses.map((e: any) => ({
           id: e.id, type: 'expense' as const, description: e.description,
           amount: e.amount, category: e.category, date: e.date,
           createdAt: e.createdAt || e.date,
+          bankAccount: e.bankAccount,
         })),
         ...allBorrowingRepayments.map((r: any) => ({
           id: r.id, type: 'expense' as const, description: `Repaid to ${r.lenderName}`,
