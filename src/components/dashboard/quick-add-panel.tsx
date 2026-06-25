@@ -45,6 +45,7 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
   const [borrowerName, setBorrowerName] = useState('');
   const [lendAmount, setLendAmount] = useState('');
   const [lendNotes, setLendNotes] = useState('');
+  const [isLendExisting, setIsLendExisting] = useState(false);
 
   // Debt Actions (new or repayment)
   const [borrowAction, setBorrowAction] = useState<'new' | 'repayment'>('new');
@@ -109,6 +110,7 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
     setExpenseAmount(''); setExpenseDesc('');
     setLenderName(''); setBorrowAmount(''); setBorrowNotes('');
     setBorrowerName(''); setLendAmount(''); setLendNotes('');
+    setIsLendExisting(false);
     setBorrowAction('new'); setLendAction('new');
   };
 
@@ -161,6 +163,7 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
             borrowerName,
             amount: Number(lendAmount),
             notes: lendNotes || undefined,
+            isExisting: isLendExisting,
           });
         } else {
           if (!selectedLendingId || !lendAmount) return;
@@ -511,6 +514,20 @@ export default function QuickAddPanel({ onTransactionAdded }: QuickAddPanelProps
                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
               />
             </div>
+            {lendAction === 'new' && (
+              <div className="flex items-center gap-2 py-1 select-none">
+                <input
+                  type="checkbox"
+                  id="isLendExisting"
+                  checked={isLendExisting}
+                  onChange={e => setIsLendExisting(e.target.checked)}
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary/20 accent-primary cursor-pointer"
+                />
+                <label htmlFor="isLendExisting" className="text-xs font-medium text-text-secondary cursor-pointer">
+                  This is existing/old lending (don&apos;t deduct from bank)
+                </label>
+              </div>
+            )}
           </div>
         )}
 

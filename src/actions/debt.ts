@@ -32,10 +32,12 @@ export async function addLending(data: {
   amount: number;
   dueDate?: string;
   notes?: string;
+  isExisting?: boolean;
 }) {
   try {
     const userId = await getSessionUser();
     const amount = Number(data.amount);
+    const isExisting = !!data.isExisting;
     const result = await prisma.lending.create({
       data: {
         userId,
@@ -46,18 +48,21 @@ export async function addLending(data: {
         notes: data.notes || '',
         status: 'pending',
         payments: [],
+        isExisting,
       },
     });
 
-    // Deduct lent amount from bank balance
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
-      await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
-        data: { balance: { decrement: amount } },
+    // Deduct lent amount from bank balance only if it is NOT an existing/old lending
+    if (!isExisting) {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
       });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { decrement: amount } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/lending');
@@ -136,15 +141,17 @@ export async function deleteLending(id: string) {
 
     await prisma.lending.delete({ where: { id } });
 
-    // Restore bank balance
-    const primaryAccount = await prisma.bankAccount.findFirst({
-      where: { userId, type: 'bank' },
-    });
-    if (primaryAccount) {
-      await prisma.bankAccount.update({
-        where: { id: primaryAccount.id },
-        data: { balance: { increment: record.remainingBalance } },
+    // Restore bank balance only if it was NOT an existing/old lending
+    if (!record.isExisting) {
+      const primaryAccount = await prisma.bankAccount.findFirst({
+        where: { userId, type: 'bank' },
       });
+      if (primaryAccount) {
+        await prisma.bankAccount.update({
+          where: { id: primaryAccount.id },
+          data: { balance: { increment: record.remainingBalance } },
+        });
+      }
     }
 
     revalidatePath('/dashboard/lending');

@@ -23,6 +23,7 @@ export default function LendingPage() {
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [isExisting, setIsExisting] = useState(false);
 
   // Add Payment Form state
   const [paymentAmount, setPaymentAmount] = useState('');
@@ -40,6 +41,7 @@ export default function LendingPage() {
       amount: Number(amount),
       dueDate: dueDate || undefined,
       notes,
+      isExisting,
     });
 
     if (!res.error) {
@@ -47,6 +49,7 @@ export default function LendingPage() {
       setAmount('');
       setDueDate('');
       setNotes('');
+      setIsExisting(false);
       setShowForm(false);
       loadData();
     }
@@ -130,7 +133,14 @@ export default function LendingPage() {
                           {lending.borrowerName.charAt(0)}
                         </div>
                         <div>
-                          <h3 className="text-sm font-semibold text-text">{lending.borrowerName}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-text">{lending.borrowerName}</h3>
+                            {lending.isExisting && (
+                              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/20">
+                                Existing
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-text-muted">{lending.notes}</p>
                         </div>
                       </div>
@@ -239,6 +249,18 @@ export default function LendingPage() {
               <div><label className="block text-xs font-medium text-text-secondary mb-1.5">Amount (₹)</label><input type="number" value={amount} onChange={e => setAmount(e.target.value)} required placeholder="0" className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" /></div>
               <div><label className="block text-xs font-medium text-text-secondary mb-1.5">Due Date (Optional)</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" /></div>
               <div><label className="block text-xs font-medium text-text-secondary mb-1.5">Notes</label><textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes..." className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50 resize-none h-20" /></div>
+              <div className="flex items-center gap-2 py-1 select-none">
+                <input
+                  type="checkbox"
+                  id="isExisting"
+                  checked={isExisting}
+                  onChange={e => setIsExisting(e.target.checked)}
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary/20 accent-primary cursor-pointer"
+                />
+                <label htmlFor="isExisting" className="text-xs font-medium text-text-secondary cursor-pointer">
+                  This is existing/old lending (don&apos;t deduct from bank)
+                </label>
+              </div>
               <button type="submit" className="w-full py-2.5 bg-primary hover:bg-primary-hover text-background font-medium rounded-lg transition-colors cursor-pointer">Add Record</button>
             </form>
           </div>

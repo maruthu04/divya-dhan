@@ -89,6 +89,7 @@ model Lending {
   notes            String?
   status           String   @default("pending") // pending, partial, completed
   payments         Json[]   // List of payments: { id, amount, date, note }
+  isExisting       Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
