@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/components/theme-provider';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Logo from '@/components/ui/logo';
 import {
   ArrowRight,
   Sparkles,
@@ -193,14 +194,7 @@ export default function LandingPage() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-ai flex items-center justify-center shadow-lg shadow-primary/20">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              Divya<span className="gradient-text">Dhan</span>
-            </span>
-          </div>
+          <Logo size="md" showSubtitle={false} />
 
           <div className="hidden md:flex items-center gap-8 text-sm text-text-secondary">
             <a href="#features" className="hover:text-text transition-colors">Features</a>
@@ -743,14 +737,7 @@ export default function LandingPage() {
       <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-ai flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold">
-                Divya<span className="gradient-text">Dhan</span>
-              </span>
-            </div>
+            <Logo size="md" showSubtitle={false} />
 
             <p className="text-sm text-text-muted">
               © {new Date().getFullYear()} DivyaDhan. Your money, your rules.

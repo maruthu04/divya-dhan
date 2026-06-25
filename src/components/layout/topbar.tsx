@@ -1,9 +1,10 @@
 'use client';
 
-import { Search, Bell, User, Sparkles, LogOut, Settings, Loader2, X, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
+import { Search, Bell, User, LogOut, Settings, Loader2, X, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Logo from '@/components/ui/logo';
 import { useRouter } from 'next/navigation';
 import { globalSearch, SearchResultItem } from '@/actions/search';
 import { getDynamicNotifications, DynamicNotification } from '@/actions/notifications';
@@ -155,14 +156,9 @@ export default function Topbar({ user }: TopbarProps) {
       <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 md:px-6 border-b border-border glass">
         {/* Left: Mobile logo */}
         <div className="flex items-center gap-3">
-          <div className="lg:hidden flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <span className="text-base font-bold">
-              Divya<span className="text-primary">Dhan</span>
-            </span>
-          </div>
+          <Link href="/dashboard" className="lg:hidden flex items-center">
+            <Logo size="sm" showSubtitle={false} />
+          </Link>
         </div>
 
         {/* Center: Search Trigger (Desktop) */}

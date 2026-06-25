@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { registerUser } from '@/actions/auth';
 import { signIn } from 'next-auth/react';
-import { ArrowRight, KeyRound, Mail, Sparkles, User, Loader2, Zap, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import Logo from '@/components/ui/logo';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -73,17 +74,14 @@ export default function SignupPage() {
 
       {/* Back to home */}
       <div className="absolute top-4 left-4 z-10">
-        <Link href="/" className="flex items-center gap-2 text-text-secondary hover:text-text transition-colors text-sm">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-ai flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-bold">DivyaDhan</span>
+        <Link href="/" className="flex items-center text-sm">
+          <Logo size="sm" showSubtitle={false} />
         </Link>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold mb-6 animate-fade-in">
-          <Sparkles className="w-3.5 h-3.5" />
+          <Logo iconOnly={true} size="sm" className="w-3.5 h-3.5" />
           <span>DivyaDhan — Personal Wealth</span>
         </div>
         <h2 className="text-3xl font-extrabold text-text tracking-tight">

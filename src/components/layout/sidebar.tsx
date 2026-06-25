@@ -8,10 +8,11 @@ import {
   Building2, HandCoins, CreditCard, TrendingUp, Target, 
   StickyNote, Scale, Bot, FileSearch, HeartPulse, FileBarChart,
   LineChart, ChevronLeft, ChevronRight, LogOut, Settings,
-  Sparkles, CalendarRange,
+  CalendarRange,
 } from 'lucide-react';
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
+import Logo from '@/components/ui/logo';
 
 interface SidebarProps {
   user?: {
@@ -73,23 +74,12 @@ export default function Sidebar({ user }: SidebarProps) {
     >
       {/* Logo */}
       <div className={cn(
-        'flex items-center h-16 px-4 border-b border-border',
-        collapsed ? 'justify-center' : 'gap-3'
+        'flex items-center h-16 border-b border-border',
+        collapsed ? 'justify-center px-2' : 'px-4 gap-3'
       )}>
-        <div className="relative flex-shrink-0 w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-primary" />
-          <div className="absolute inset-0 rounded-xl animate-pulse-glow" />
-        </div>
-        {!collapsed && (
-          <div className="animate-fade-in">
-            <h1 className="text-lg font-bold tracking-tight">
-              Divya<span className="text-primary">Dhan</span>
-            </h1>
-            <p className="text-[10px] text-text-muted tracking-widest uppercase -mt-0.5">
-              Personal Wealth
-            </p>
-          </div>
-        )}
+        <Link href="/dashboard" className="flex items-center">
+          <Logo iconOnly={collapsed} size="md" showSubtitle={true} />
+        </Link>
       </div>
 
       {/* Navigation */}
