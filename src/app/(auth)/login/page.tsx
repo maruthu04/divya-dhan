@@ -67,7 +67,7 @@ export default function LoginPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold mb-6 animate-fade-in">
-          <Logo iconOnly={true} size="sm" className="w-3.5 h-3.5" />
+          <Logo iconOnly={true} size="xs" />
           <span>DivyaDhan — Personal Wealth</span>
         </div>
         <h2 className="text-3xl font-extrabold text-text tracking-tight">
