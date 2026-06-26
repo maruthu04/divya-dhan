@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { addAccount, deleteAccount } from '@/actions/accounts';
+import { addAccount, deleteAccount, updateAccount, transferMoney } from '@/actions/accounts';
 import { useData } from '@/components/dashboard/data-provider';
 import { getGoals, addMoneyToGoals } from '@/actions/goals';
 import { ACCOUNT_TYPES } from '@/lib/constants';
 import { formatCurrency } from '@/lib/formatters';
-import { Building2, Wallet, PiggyBank, Lock, Plus, X, TrendingUp, Trash2, Loader2, Target, Edit2 } from 'lucide-react';
+import { Building2, Wallet, PiggyBank, Lock, Plus, X, TrendingUp, Trash2, Loader2, Target, Edit2, ArrowLeftRight } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 const iconMap: Record<string, any> = { Building2, Wallet, PiggyBank, Lock };
@@ -27,11 +27,19 @@ export default function AccountsPage() {
   const [isSavingGoalMoney, setIsSavingGoalMoney] = useState(false);
 
   // Form states
+  const [editingAccount, setEditingAccount] = useState<any | null>(null);
   const [name, setName] = useState('');
   const [type, setType] = useState('bank');
   const [balance, setBalance] = useState('');
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
+
+  // Transfer states
+  const [showTransferForm, setShowTransferForm] = useState(false);
+  const [fromAccountId, setFromAccountId] = useState('');
+  const [toAccountId, setToAccountId] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
 
   const fetchGoals = async () => {
     const goalsData = await getGoals();
@@ -43,27 +51,73 @@ export default function AccountsPage() {
     fetchGoals();
   }, []);
 
+  const handleAddClick = () => {
+    setEditingAccount(null);
+    setName('');
+    setType('bank');
+    setBalance('');
+    setBankName('');
+    setAccountNumber('');
+    setShowForm(true);
+  };
+
+  const handleEditClick = (account: any) => {
+    setEditingAccount(account);
+    setName(account.name);
+    setType(account.type);
+    setBalance(account.balance.toString());
+    setBankName(account.bankName || '');
+    setAccountNumber(account.accountNumber || '');
+    setShowForm(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !balance) return;
 
-    const res = await addAccount({
-      name,
-      type,
-      balance: Number(balance),
-      bankName: type === 'bank' ? bankName : undefined,
-      accountNumber: type === 'bank' ? accountNumber : undefined,
-      color: typeColors[type] || '#3B82F6',
-      icon: type === 'bank' ? 'Building2' : type === 'wallet' ? 'Wallet' : type === 'savings' ? 'PiggyBank' : 'Lock',
-    });
+    if (editingAccount) {
+      const res = await updateAccount(editingAccount.id, {
+        name,
+        type,
+        balance: Number(balance),
+        bankName: type === 'bank' ? bankName : undefined,
+        accountNumber: type === 'bank' ? accountNumber : undefined,
+        color: typeColors[type] || '#3B82F6',
+        icon: type === 'bank' ? 'Building2' : type === 'wallet' ? 'Wallet' : type === 'savings' ? 'PiggyBank' : 'Lock',
+      });
 
-    if (!res.error) {
-      setName('');
-      setBalance('');
-      setBankName('');
-      setAccountNumber('');
-      setShowForm(false);
-      loadData();
+      if (!res.error) {
+        setEditingAccount(null);
+        setName('');
+        setBalance('');
+        setBankName('');
+        setAccountNumber('');
+        setShowForm(false);
+        loadData();
+      } else {
+        alert(res.error);
+      }
+    } else {
+      const res = await addAccount({
+        name,
+        type,
+        balance: Number(balance),
+        bankName: type === 'bank' ? bankName : undefined,
+        accountNumber: type === 'bank' ? accountNumber : undefined,
+        color: typeColors[type] || '#3B82F6',
+        icon: type === 'bank' ? 'Building2' : type === 'wallet' ? 'Wallet' : type === 'savings' ? 'PiggyBank' : 'Lock',
+      });
+
+      if (!res.error) {
+        setName('');
+        setBalance('');
+        setBankName('');
+        setAccountNumber('');
+        setShowForm(false);
+        loadData();
+      } else {
+        alert(res.error);
+      }
     }
   };
 
@@ -104,9 +158,14 @@ export default function AccountsPage() {
           </h1>
           <p className="text-sm text-text-muted mt-1">Track all your accounts, wallets, and savings</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-background text-sm font-medium rounded-lg transition-colors cursor-pointer">
-          <Plus className="w-4 h-4" /> Add Account
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => setShowTransferForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-surface border border-border hover:bg-surface-hover text-text text-sm font-medium rounded-lg transition-colors cursor-pointer">
+            <ArrowLeftRight className="w-4 h-4 text-primary" /> Transfer Money
+          </button>
+          <button onClick={handleAddClick} className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-background text-sm font-medium rounded-lg transition-colors cursor-pointer">
+            <Plus className="w-4 h-4" /> Add Account
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -204,18 +263,27 @@ export default function AccountsPage() {
                 const Icon = iconMap[account.icon] || Building2;
                 return (
                   <div key={account.id} className="bg-surface border border-border rounded-xl p-5 card-hover animate-slide-up relative group" style={{ animationDelay: `${(i + 2) * 50}ms` }}>
-                    <button
-                      onClick={() => handleDelete(account.id)}
-                      className="absolute top-4 right-4 p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all cursor-pointer"
-                      title="Delete account"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="absolute top-4 right-4 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
+                      <button
+                        onClick={() => handleEditClick(account)}
+                        className="p-1.5 bg-background hover:bg-primary/10 border border-border hover:border-primary/20 rounded-lg text-text-muted hover:text-primary transition-all cursor-pointer"
+                        title="Edit account"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(account.id)}
+                        className="p-1.5 bg-background hover:bg-danger/10 border border-border hover:border-danger/20 rounded-lg text-text-muted hover:text-danger transition-all cursor-pointer"
+                        title="Delete account"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${account.color}15` }}>
                         <Icon className="w-5 h-5" style={{ color: account.color }} />
                       </div>
-                      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider px-2 py-0.5 border border-border rounded-full mr-6">{account.type}</span>
+                      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider px-2 py-0.5 border border-border rounded-full mr-16">{account.type}</span>
                     </div>
                     <h3 className="text-sm font-semibold text-text">{account.name}</h3>
                     {account.bankName && <p className="text-xs text-text-muted mt-0.5">{account.bankName} {account.accountNumber}</p>}
@@ -234,7 +302,7 @@ export default function AccountsPage() {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative bg-surface border border-border rounded-2xl p-6 w-full max-w-md animate-slide-up shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-text">Add Account</h2>
+              <h2 className="text-lg font-semibold text-text">{editingAccount ? 'Edit Account' : 'Add Account'}</h2>
               <button onClick={() => setShowForm(false)} className="p-1 rounded-lg hover:bg-surface-hover cursor-pointer"><X className="w-5 h-5 text-text-muted" /></button>
             </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -264,7 +332,9 @@ export default function AccountsPage() {
                   </div>
                 </>
               )}
-              <button type="submit" className="w-full py-2.5 bg-primary hover:bg-primary-hover text-background font-medium rounded-lg transition-colors cursor-pointer">Add Account</button>
+              <button type="submit" className="w-full py-2.5 bg-primary hover:bg-primary-hover text-background font-medium rounded-lg transition-colors cursor-pointer">
+                {editingAccount ? 'Save Changes' : 'Add Account'}
+              </button>
             </form>
           </div>
         </div>
@@ -347,6 +417,105 @@ export default function AccountsPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {/* Transfer Money Modal */}
+      {showTransferForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowTransferForm(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative bg-surface border border-border rounded-2xl p-6 w-full max-w-md animate-slide-up shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-text">Transfer Money</h2>
+              <button onClick={() => setShowTransferForm(false)} className="p-1 rounded-lg hover:bg-surface-hover cursor-pointer">
+                <X className="w-5 h-5 text-text-muted" />
+              </button>
+            </div>
+            <form className="space-y-4" onSubmit={async (e) => {
+              e.preventDefault();
+              if (!fromAccountId || !toAccountId || !transferAmount) return;
+              setIsTransferring(true);
+              const res = await transferMoney({
+                fromAccountId,
+                toAccountId,
+                amount: Number(transferAmount),
+              });
+              if (res.error) {
+                alert(res.error);
+              } else {
+                setFromAccountId('');
+                setToAccountId('');
+                setTransferAmount('');
+                setShowTransferForm(false);
+                loadData();
+              }
+              setIsTransferring(false);
+            }}>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">From Account</label>
+                <select 
+                  value={fromAccountId} 
+                  onChange={e => {
+                    setFromAccountId(e.target.value);
+                    if (e.target.value === toAccountId) {
+                      setToAccountId('');
+                    }
+                  }} 
+                  required 
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
+                >
+                  <option value="">Select source account</option>
+                  {accounts.map(a => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({formatCurrency(a.balance)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">To Account</label>
+                <select 
+                  value={toAccountId} 
+                  onChange={e => setToAccountId(e.target.value)} 
+                  required 
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50"
+                >
+                  <option value="">Select destination account</option>
+                  {accounts.filter(a => a.id !== fromAccountId).map(a => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({formatCurrency(a.balance)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-secondary mb-1.5">Amount (₹)</label>
+                <input 
+                  type="number" 
+                  value={transferAmount} 
+                  onChange={e => setTransferAmount(e.target.value)} 
+                  required 
+                  min="0.01" 
+                  step="any" 
+                  placeholder="0.00" 
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" 
+                />
+              </div>
+              <button 
+                type="submit" 
+                disabled={isTransferring}
+                className="w-full py-2.5 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-background font-medium rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                {isTransferring ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Transfer'
+                )}
+              </button>
+            </form>
           </div>
         </div>
       )}

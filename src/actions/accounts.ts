@@ -78,3 +78,97 @@ export async function deleteAccount(id: string) {
     return { error: error.message || 'Failed to delete account' };
   }
 }
+
+export async function updateAccount(
+  id: string,
+  data: {
+    name: string;
+    type: string;
+    balance: number;
+    bankName?: string;
+    accountNumber?: string;
+    color: string;
+    icon: string;
+  }
+) {
+  try {
+    const userId = await getSessionUser();
+    const record = await prisma.bankAccount.findUnique({ where: { id } });
+
+    if (!record || record.userId !== userId) {
+      return { error: 'Not authorized to update this account' };
+    }
+
+    const result = await prisma.bankAccount.update({
+      where: { id },
+      data: {
+        name: data.name,
+        type: data.type,
+        balance: Number(data.balance),
+        bankName: data.bankName || '',
+        accountNumber: data.accountNumber || '',
+        color: data.color,
+        icon: data.icon,
+      },
+    });
+
+    revalidatePath('/dashboard/accounts');
+    revalidatePath('/dashboard');
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error('Error updating account:', error);
+    return { error: error.message || 'Failed to update account' };
+  }
+}
+
+export async function transferMoney(data: {
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+}) {
+  try {
+    const userId = await getSessionUser();
+    const amount = Number(data.amount);
+    
+    if (isNaN(amount) || amount <= 0) {
+      return { error: 'Invalid transfer amount' };
+    }
+    if (data.fromAccountId === data.toAccountId) {
+      return { error: 'Cannot transfer to the same account' };
+    }
+
+    const [fromAccount, toAccount] = await Promise.all([
+      prisma.bankAccount.findUnique({ where: { id: data.fromAccountId } }),
+      prisma.bankAccount.findUnique({ where: { id: data.toAccountId } }),
+    ]);
+
+    if (!fromAccount || fromAccount.userId !== userId) {
+      return { error: 'Sender account not found or unauthorized' };
+    }
+    if (!toAccount || toAccount.userId !== userId) {
+      return { error: 'Recipient account not found or unauthorized' };
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedFrom = await tx.bankAccount.update({
+        where: { id: data.fromAccountId },
+        data: { balance: { decrement: amount } },
+      });
+
+      const updatedTo = await tx.bankAccount.update({
+        where: { id: data.toAccountId },
+        data: { balance: { increment: amount } },
+      });
+
+      return { updatedFrom, updatedTo };
+    });
+
+    revalidatePath('/dashboard/accounts');
+    revalidatePath('/dashboard');
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error('Error transferring money:', error);
+    return { error: error.message || 'Failed to transfer money' };
+  }
+}
+
