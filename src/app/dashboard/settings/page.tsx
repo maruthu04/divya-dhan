@@ -148,22 +148,20 @@ export default function SettingsPage() {
       <div className="flex border-b border-border">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all cursor-pointer ${
-            activeTab === 'profile'
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all cursor-pointer ${activeTab === 'profile'
               ? 'border-primary text-primary'
               : 'border-transparent text-text-muted hover:text-text'
-          }`}
+            }`}
         >
           <User className="w-4 h-4" />
           Profile Info
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all cursor-pointer ${
-            activeTab === 'security'
+          className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all cursor-pointer ${activeTab === 'security'
               ? 'border-primary text-primary'
               : 'border-transparent text-text-muted hover:text-text'
-          }`}
+            }`}
         >
           <Shield className="w-4 h-4" />
           Security & Password

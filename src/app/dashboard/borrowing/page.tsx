@@ -82,6 +82,19 @@ export default function BorrowingPage() {
   const outstanding = borrowings.reduce((sum, b) => sum + b.remainingBalance, 0);
   const repaid = totalBorrowed - outstanding;
 
+  const sortedBorrowings = [...borrowings].sort((a, b) => {
+    const aCompleted = a.status === 'completed' || a.remainingBalance === 0;
+    const bCompleted = b.status === 'completed' || b.remainingBalance === 0;
+
+    if (aCompleted !== bCompleted) {
+      return aCompleted ? 1 : -1;
+    }
+
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+    return dateB - dateA;
+  });
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
@@ -114,7 +127,7 @@ export default function BorrowingPage() {
           </div>
 
           <div className="space-y-3">
-            {borrowings.map((borrowing, i) => {
+            {sortedBorrowings.map((borrowing, i) => {
               const status = statusConfig[borrowing.status] || statusConfig.pending;
               const StatusIcon = status.icon;
               const isExpanded = expandedId === borrowing.id;

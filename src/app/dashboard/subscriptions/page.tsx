@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Calendar, Tv, CreditCard, Code, Dumbbell, Sparkles, Plus, 
+import {
+  Calendar, Tv, CreditCard, Code, Dumbbell, Sparkles, Plus,
   Trash, Edit2, Loader2, CalendarDays, AlertCircle, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  addSubscription, updateSubscription, 
-  toggleSubscriptionActive, deleteSubscription 
+import {
+  addSubscription, updateSubscription,
+  toggleSubscriptionActive, deleteSubscription
 } from '@/actions/subscriptions';
 import { useData } from '@/components/dashboard/data-provider';
 
@@ -254,7 +254,7 @@ export default function SubscriptionsPage() {
                 <div key={sub.id} className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-surface-hover/30 ${!sub.active ? 'opacity-60' : ''}`}>
                   {/* Category icon + Details */}
                   <div className="flex items-center gap-4 min-w-0">
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: catMeta.bg, color: catMeta.color }}
                     >
@@ -284,15 +284,14 @@ export default function SubscriptionsPage() {
                         <p className="text-sm font-semibold text-text">
                           {due.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
-                        <span className={`text-[10px] font-semibold flex items-center gap-1 mt-0.5 ${
-                          isOverdue ? 'text-danger' : daysLeft <= 3 ? 'text-warning' : 'text-text-muted'
-                        }`}>
-                          {isOverdue 
-                            ? 'Overdue' 
-                            : daysLeft === 0 
-                              ? 'Due Today' 
-                              : daysLeft === 1 
-                                ? 'Due tomorrow' 
+                        <span className={`text-[10px] font-semibold flex items-center gap-1 mt-0.5 ${isOverdue ? 'text-danger' : daysLeft <= 3 ? 'text-warning' : 'text-text-muted'
+                          }`}>
+                          {isOverdue
+                            ? 'Overdue'
+                            : daysLeft === 0
+                              ? 'Due Today'
+                              : daysLeft === 1
+                                ? 'Due tomorrow'
                                 : `Due in ${daysLeft} days`}
                         </span>
                       </div>
@@ -306,7 +305,7 @@ export default function SubscriptionsPage() {
                     {/* Active Toggle & Buttons */}
                     <div className="flex items-center gap-2">
                       {/* Toggle status */}
-                      <button 
+                      <button
                         onClick={() => handleToggleActive(sub.id, sub.active)}
                         className="p-1 hover:bg-border/30 rounded cursor-pointer transition-colors"
                         title={sub.active ? 'Pause subscription' : 'Activate subscription'}
@@ -352,7 +351,7 @@ export default function SubscriptionsPage() {
               <h3 className="text-sm font-semibold text-text">
                 {editId ? 'Edit Subscription' : 'Add Subscription'}
               </h3>
-              <button 
+              <button
                 onClick={() => setModalOpen(false)}
                 className="p-1 hover:bg-border/30 rounded-lg text-text-muted hover:text-text cursor-pointer"
               >

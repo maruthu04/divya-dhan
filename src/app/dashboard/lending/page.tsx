@@ -85,6 +85,19 @@ export default function LendingPage() {
   const outstanding = lendings.reduce((sum, l) => sum + l.remainingBalance, 0);
   const recovered = totalLent - outstanding;
 
+  const sortedLendings = [...lendings].sort((a, b) => {
+    const aCompleted = a.status === 'completed' || a.remainingBalance === 0;
+    const bCompleted = b.status === 'completed' || b.remainingBalance === 0;
+
+    if (aCompleted !== bCompleted) {
+      return aCompleted ? 1 : -1;
+    }
+
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+    return dateB - dateA;
+  });
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
@@ -118,7 +131,7 @@ export default function LendingPage() {
 
           {/* Lending Cards */}
           <div className="space-y-3">
-            {lendings.map((lending, i) => {
+            {sortedLendings.map((lending, i) => {
               const status = statusConfig[lending.status] || statusConfig.pending;
               const StatusIcon = status.icon;
               const isExpanded = expandedId === lending.id;
